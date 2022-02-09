@@ -1,0 +1,13 @@
+{
+    "name"         : "@digital-twin/node-red-contrib-digital-twin",
+    "version"      : "0.0.1",
+    "description"  : "Core module for the Digital Twin Node-RED",
+    "dependencies": {
+    },
+    "keywords": [ "node-red", "digital-twin", "iot" ],
+    "node-red"     : {
+        "nodes": {
+            "asset": "observable-asset/observable-asset.js"
+        }
+    }
+}
