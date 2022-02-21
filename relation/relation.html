@@ -1,0 +1,26 @@
+<script type="text/javascript">
+    RED.nodes.registerType('relation',{
+        category: 'digital twin',   
+        color: '#c4c4c4',
+        defaults: {
+            name: {value:"relation"}
+        },
+        inputs:1,
+        outputs:1,
+        icon: "font-awesome/fa-chain",
+        label: function() {
+            return this.name||"relation";
+        }
+    });
+</script>
+
+<script type="text/html" data-template-name="relation">
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+</script>
+
+<script type="text/html" data-help-name="relation">
+    <p>Relation between two nodes</p>
+</script>
