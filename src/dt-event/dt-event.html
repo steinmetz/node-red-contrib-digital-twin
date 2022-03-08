@@ -6,11 +6,12 @@
         inputs: 1,
         outputs: 1,
         defaults: {
-            bound_to: { value: "" }
+            bound_to: { value: "" },
+            name: { value: "" }
         },
         icon: 'hash.svg',
-        label: function() {
-            this.name || 'dt-event'
+        label: function () {
+            return this.name || 'dt-event'
         }
     });
 </script>

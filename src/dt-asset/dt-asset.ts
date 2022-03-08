@@ -7,7 +7,6 @@ interface DTAssetNodeDef extends nodered.NodeDef {
 export = (RED: nodered.NodeAPI): void => {
     function DTAsset(this: nodered.Node, config: DTAssetNodeDef): void {
         RED.nodes.createNode(this, config);
-        this.name = config.name;
         this.on('input', (msg: any, send, done): void => {
             send(msg);
         });

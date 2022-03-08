@@ -4,13 +4,14 @@
         category: 'digital twin',
         color: '#C0DEED',
         defaults: {
-            bound_to: { value: "" }
+            bound_to: { value: "" },
+            name: { value: "" }
         },
         inputs: 1,
         outputs: 1,
         icon: 'hash.svg',
         label: function () {
-            this.name || 'dt-graph'
+            return this.name || 'dt-graph'
         }
     });
     RED.events.on('deploy', function (msg) {
