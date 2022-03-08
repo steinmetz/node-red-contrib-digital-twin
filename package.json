@@ -21,6 +21,7 @@
             "dt-action": "src/dt-action/dt-action.js",
             "dt-asset": "src/dt-asset/dt-asset.js",
             "dt-event": "src/dt-event/dt-event.js",
+            "dt-graph": "src/dt-graph/dt-graph.js",
             "dt-property": "src/dt-property/dt-property.js",
             "dt-relation": "src/dt-relation/dt-relation.js"
         }
