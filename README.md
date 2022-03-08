@@ -2,7 +2,7 @@
 
 A set of NodeRED nodes for modeling Digital Twins.
 
-![image](https://user-images.githubusercontent.com/3587083/157247342-44155974-7e15-4b30-b1fa-71f83dee05e3.png =x300)
+![image](https://user-images.githubusercontent.com/3587083/157247342-44155974-7e15-4b30-b1fa-71f83dee05e3.png)
 
 
 # Nodes
