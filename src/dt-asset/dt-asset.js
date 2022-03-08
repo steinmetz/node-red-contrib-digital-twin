@@ -1,10 +1,10 @@
 "use strict";
-module.exports = (RED) => {
+module.exports = function (RED) {
     function DTAsset(config) {
         RED.nodes.createNode(this, config);
-        this.on('input', (msg, send, done) => {
+        this.name = config.name;
+        this.on('input', function (msg, send, done) {
             send(msg);
-            console.log(msg);
         });
     }
     ;

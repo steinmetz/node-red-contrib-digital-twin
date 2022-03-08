@@ -4,5 +4,7 @@
     "exclude": ["node_modules, nodes"],
     "compilerOptions": {
         "rootDir": "src",
+        "target": "es5",
+        "module": "commonjs"
     }
 }
