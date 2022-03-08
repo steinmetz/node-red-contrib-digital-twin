@@ -1,0 +1,35 @@
+<script type="text/javascript">
+    RED.nodes.registerType('dt-event', {
+        // node definition
+        category: 'digital twin',
+        color: '#FFE6CC',
+        inputs: 1,
+        outputs: 1,
+        defaults: {
+            bound_to: { value: "" }
+        },
+        icon: 'hash.svg',
+        label: function() {
+            this.name || 'dt-event'
+        }
+    });
+</script>
+
+<script type="text/html" data-template-name="dt-event">
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+    <div class="form-tips"><b>Tip:</b> This is here to help.</div>
+</script>
+
+<script type="text/html" data-help-name="dt-event">
+   <p>Some useful help text to introduce the node.</p>
+   <h3>Outputs</h3>
+       <dl class="message-properties">
+       <dt>payload
+           <span class="property-type">string | buffer</span>
+       </dt>
+   <h3>Details</h3>
+   <p>Some more information about the node.</p>
+</script>
