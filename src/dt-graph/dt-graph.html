@@ -17,14 +17,16 @@
     RED.events.on('deploy', function (msg) {
         console.log('deploy...');
 
-        let dtAssets = RED.nodes.filterNodes({ 'type': 'dt-asset' });
+        let allNodes = RED.nodes.createCompleteNodeSet();
+        let allDTNodes = allNodes.filter(node => node.type.startsWith('dt-'));
+        let assets = allNodes.filter((node) => node.type == 'dt-asset');
 
-        for (let asset of dtAssets) {
-            console.log(RED.nodes.getAllFlowNodes(asset));
+        for (let asset of assets) {
+            let connectedNodes = allDTNodes.filter((node) => asset.wires[0].includes(node.id));
+            let nodesConnectedToAsset = allDTNodes.filter((node) => node.wires[0].includes(asset.id));
+            console.log(asset.name, "connected to: ", connectedNodes.map((node) => node.name));
+            console.log("connected to ", asset.name, ": ", nodesConnectedToAsset.map((node) => node.name));
         }
-        // RED.nodes.eachNode((node) => {
-        //     console.log(node);
-        // });
     });
 
 </script>
