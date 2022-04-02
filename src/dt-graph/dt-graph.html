@@ -24,6 +24,18 @@
         for (let asset of assets) {
             let connectedNodes = allDTNodes.filter((node) => asset.wires[0].includes(node.id));
             let nodesConnectedToAsset = allDTNodes.filter((node) => node.wires[0].includes(asset.id));
+
+
+            for(let connectedNode of connectedNodes){
+                //if there is no relation between the asset and the node, create one
+                if(connectedNode.type != 'dt-relation'){
+                    console.log('has');
+                }else{
+                    console.log(connectedNode.name);
+                } 
+            }
+
+
             console.log(asset.name, "connected to: ", connectedNodes.map((node) => node.name));
             console.log("connected to ", asset.name, ": ", nodesConnectedToAsset.map((node) => node.name));
         }
