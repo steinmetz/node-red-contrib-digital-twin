@@ -7,7 +7,7 @@ export namespace DT {
         export const on = _myEmitter.on.bind(_myEmitter);
         export const emit = _myEmitter.emit.bind(_myEmitter);
     }
-    export namespace eventsNames {
+    export namespace eventNames {
         export const updateAsset = 'updateAsset';
     }
 }

@@ -10,8 +10,8 @@ var DT;
         events.on = _myEmitter.on.bind(_myEmitter);
         events.emit = _myEmitter.emit.bind(_myEmitter);
     })(events = DT.events || (DT.events = {}));
-    var eventsNames;
-    (function (eventsNames) {
-        eventsNames.updateAsset = 'updateAsset';
-    })(eventsNames = DT.eventsNames || (DT.eventsNames = {}));
+    var eventNames;
+    (function (eventNames) {
+        eventNames.updateAsset = 'updateAsset';
+    })(eventNames = DT.eventNames || (DT.eventNames = {}));
 })(DT = exports.DT || (exports.DT = {}));
