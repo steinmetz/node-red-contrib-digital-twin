@@ -1,7 +1,8 @@
 import * as nodered from "node-red"
 
 interface DTRelationNodeDef extends nodered.NodeDef {
-    bound_to: string
+    bound_to: string,
+    direction: string, //forward, backward, bidirectional
 }
 
 export = (RED: nodered.NodeAPI): void => {
