@@ -14,31 +14,12 @@
             return this.name || 'dt-graph'
         }
     });
+    
     RED.events.on('deploy', function (msg) {
-        console.log('deploy...');
-
         let allNodes = RED.nodes.createCompleteNodeSet();
         let allDTNodes = allNodes.filter(node => node.type.startsWith('dt-'));
-        let assets = allNodes.filter((node) => node.type == 'dt-asset');
-
-        for (let asset of assets) {
-            let connectedNodes = allDTNodes.filter((node) => asset.wires[0].includes(node.id));
-            let nodesConnectedToAsset = allDTNodes.filter((node) => node.wires[0].includes(asset.id));
-
-
-            for(let connectedNode of connectedNodes){
-                //if there is no relation between the asset and the node, create one
-                if(connectedNode.type != 'dt-relation'){
-                    console.log('has');
-                }else{
-                    console.log(connectedNode.name);
-                } 
-            }
-
-
-            console.log(asset.name, "connected to: ", connectedNodes.map((node) => node.name));
-            console.log("connected to ", asset.name, ": ", nodesConnectedToAsset.map((node) => node.name));
-        }
+        let nodes = JSON.stringify(allDTNodes);
+        $.post('/dt-graph', {nodes: nodes, action: 'deploy'});
     });
 
 </script>
