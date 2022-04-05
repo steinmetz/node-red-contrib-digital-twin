@@ -1,7 +1,7 @@
 import * as nodered from "node-red"
 
 interface DTActionNodeDef extends nodered.NodeDef {
-    bound_to: string
+    params: Map<string, any>;    
 }
 
 export = (RED: nodered.NodeAPI): void => {
