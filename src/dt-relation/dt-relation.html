@@ -4,15 +4,15 @@
         category: 'digital twin',
         color: '#F5F5F5',
         defaults: {
-            bound_to: { value: "" },
-            name: { value: "" },
-            direction: { value: "forward" }
+            name: { value: "", required: true },
+            direction: { value: "-->", default: "-->" }
         },
         inputs: 1,
         outputs: 1,
         icon: 'hash.svg',
         label: function () {
-            return this.name || 'dt-relation'
+            let name = this.name || 'dt-relation';
+            return name + ' (' + this.direction + ')';
         }
     });
 </script>
@@ -21,6 +21,12 @@
     <div class="form-row">
         <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
         <input type="text" id="node-input-name" placeholder="Name">
+        <label for="node-input-name"><i class="fa fa-tasks"></i> Direction</label>
+        <select id="node-input-direction">
+            <option value="-->">--></option>
+            <option value="<--"><--</option>
+            <option value="<-->"><--></option>
+          </select>
     </div>
     <div class="form-tips"><b>Tip:</b> This is here to help.</div>
 </script>

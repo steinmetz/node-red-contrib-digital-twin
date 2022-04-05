@@ -56,9 +56,10 @@ export = (RED: nodered.NodeAPI): void => {
                                 a${label}.nodered_type = '${connectedNode.type}'`;
                         } else if (connectedNode.type == 'dt-relation') {
                             let relationTarget = nodes.filter((node) => connectedNode.wires[0].includes(node.id));
+                            let relationCypher = getRelationCypher(connectedNode.direction, connectedNode.name);
                             for (let target of relationTarget) {
                                 cypher += `\nMERGE (t${label}:Asset {nodered_id: '${target.id}'})
-                                MERGE (a)-[:${connectedNode.name}]->(t${label})
+                                MERGE (a)${relationCypher}(t${label})
                                 SET t${label}.name = '${target.name}',
                                     t${label}.nodered_type = '${target.type}'`;
                                 label++;
@@ -80,9 +81,10 @@ export = (RED: nodered.NodeAPI): void => {
                                     a${label}.nodered_type = '${node.type}'`;
                         } else if (node.type == 'dt-relation') {
                             let relationTarget = nodes.filter((node) => node.wires[0].includes(node.id));
+                            let relationCypher = getRelationCypher(node.direction, node.name);
                             for (let target of relationTarget) {
                                 cypher += `\nMERGE (t${label}:Asset {nodered_id: '${target.id}'})
-                                    MERGE (a)-[:${node.name}]->(t${label})
+                                    MERGE (a)${relationCypher}(t${label})
                                     SET t${label}.name = '${target.name}',
                                         t${label}.nodered_type = '${target.type}'`;
                                 label++;
@@ -115,3 +117,9 @@ export = (RED: nodered.NodeAPI): void => {
     };
     RED.nodes.registerType('dt-graph', DTGraph);
 };
+
+function  getRelationCypher(direction: string, name: string): string {
+    if (direction == '-->') return `-[:${name}]->`;
+    if (direction == '<--') return `<-[:${name}]-`;
+    return `<-[:${name}]->`;
+}
