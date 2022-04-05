@@ -1,5 +1,5 @@
 import * as nodered from "node-red"
-import { DT } from '../core/dt'
+import { DT } from '../resources/dt'
 interface DTAssetNodeDef extends nodered.NodeDef {
     bound_to: string
 }
