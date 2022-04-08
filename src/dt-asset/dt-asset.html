@@ -4,8 +4,8 @@
         category: 'digital twin',
         color: '#C7E9C0',
         defaults: {
-            bound_to: { value: "" },
-            name: { value: "" }
+            name: { value: "" },
+            dt_type: { value: "Generic" },
         },
         inputs: 1,
         outputs: 1,
@@ -20,6 +20,19 @@
     <div class="form-row">
         <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
         <input type="text" id="node-input-name" placeholder="Name">
+        <label for="node-input-dt_type"><i class="fa fa-tag"></i> DT Type</label>
+        <select id="node-input-dt_type">
+            <option value="Generic">Generic</option>
+            <option value="Part">Part</option>
+            <option value="Product">Product</option>
+            <option value="Equipment">Equipment</option>
+            <option value="Material">Material</option>
+            <option value="Process">Process</option>
+            <option value="Facility">Facility</option>
+            <option value="Environment">Environment</option>
+            <option value="Personnel">Personnel</option>
+            <option value="SupportingDocuments">SupportingDocuments</option>
+        </select>        
     </div>
     <div class="form-tips"><b>Tip:</b> This is here to help.</div>
 </script>

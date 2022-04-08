@@ -1,8 +1,6 @@
 import * as nodered from "node-red"
 import { DT } from '../resources/dt'
-interface DTAssetNodeDef extends nodered.NodeDef {
-    bound_to: string
-}
+import { DTAssetNodeDef } from '../resources/types'
 
 export = (RED: nodered.NodeAPI): void => {
     function DTAsset(this: nodered.Node, config: DTAssetNodeDef): void {
