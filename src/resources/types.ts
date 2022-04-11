@@ -26,3 +26,5 @@ export interface DTNodeDef extends nodered.NodeDef {
 export interface DTAssetNodeDef extends DTNodeDef {
   dt_type: string;
 }
+  
+export interface DTModelNodeDef extends DTNodeDef {}

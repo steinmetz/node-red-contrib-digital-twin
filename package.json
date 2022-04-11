@@ -23,7 +23,8 @@
             "dt-event": "src/dt-event/dt-event.js",
             "dt-graph": "src/dt-graph/dt-graph.js",
             "dt-property": "src/dt-property/dt-property.js",
-            "dt-relation": "src/dt-relation/dt-relation.js"
+            "dt-relation": "src/dt-relation/dt-relation.js",
+            "dt-model": "src/dt-model/dt-model.js"
         }
     },
     "devDependencies": {
