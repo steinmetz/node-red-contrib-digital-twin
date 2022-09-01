@@ -1,15 +1,22 @@
 "use strict";
+var crypto_1 = require("crypto");
 module.exports = function (RED) {
     function DTProperty(config) {
-        var _this = this;
         RED.nodes.createNode(this, config);
+        this.accessGroup = config.accessGroup;
+        this.aContext = config.aContext;
+        this.aId = config.aId;
+        var node = this;
         this.on('input', function (msg, send, done) {
-            var _a;
+            node.value = msg.payload;
             var data = {
-                propertyName: (_a = _this.name) !== null && _a !== void 0 ? _a : '',
-                propertyValue: msg.payload,
-                propertyId: _this.id,
+                id: (0, crypto_1.randomUUID)(),
+                content: node,
             };
+            if (node.name == 'temperature') {
+                console.log('DTProperty node: ', node);
+                console.log('DTProperty data: ', data);
+            }
             send(data);
         });
     }

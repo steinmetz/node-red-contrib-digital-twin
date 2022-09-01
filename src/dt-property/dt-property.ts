@@ -1,27 +1,26 @@
+import { randomUUID } from "crypto";
 import * as nodered from "node-red"
-
-interface DTPropertyNodeDef extends nodered.NodeDef {
-    bound_to: string
-}
-
-interface DTPropertyNodeMessage extends nodered.NodeMessage {
-    propertyName: string,
-    propertyValue: any,
-    propertyId: string,
-}
+import { DTPropertyNode, DTPropertyNodeDef, DTPropertyNodeMessage } from "../resources/types";
 
 export = (RED: nodered.NodeAPI): void => {
-    function DTProperty(this: nodered.Node, config: DTPropertyNodeDef): void {
+    function DTProperty(this: DTPropertyNode, config: DTPropertyNodeDef): void {
         RED.nodes.createNode(this, config);
+        this.accessGroup = config.accessGroup;
+        this.aContext = config.aContext;
+        this.aId = config.aId;
+        var node = this;
         this.on('input', (msg: any, send, done): void => {
+            node.value = msg.payload;
             let data: DTPropertyNodeMessage = {
-                propertyName: this.name ?? '',
-                propertyValue: msg.payload,
-                propertyId: this.id,
+                id: randomUUID(),
+                content: node,
             };
+            if (node.name == 'temperature') {
+                console.log('DTProperty node: ', node);
+                console.log('DTProperty data: ', data);
+            }
             send(data);
         });
-
     };
     RED.nodes.registerType('dt-property', DTProperty);
 };
