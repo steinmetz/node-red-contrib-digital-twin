@@ -15,10 +15,6 @@ export = (RED: nodered.NodeAPI): void => {
                 id: randomUUID(),
                 content: node,
             };
-            if (node.name == 'temperature') {
-                console.log('DTProperty node: ', node);
-                console.log('DTProperty data: ', data);
-            }
             send(data);
         });
     };

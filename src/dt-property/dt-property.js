@@ -13,10 +13,6 @@ module.exports = function (RED) {
                 id: (0, crypto_1.randomUUID)(),
                 content: node,
             };
-            if (node.name == 'temperature') {
-                console.log('DTProperty node: ', node);
-                console.log('DTProperty data: ', data);
-            }
             send(data);
         });
     }
