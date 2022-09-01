@@ -1,38 +1,14 @@
 {
     "name": "@digitaltwins/node-red-contrib-digital-twin",
-    "version": "0.0.1",
+    "version": "0.0.3",
     "description": "Nodes for modeling Digital Twins",
     "directories": {
         "example": "examples"
     },
-    "dependencies": {
-        "color-name": "^1.1.4",
-        "cliui": "^7.0.4",
-        "ansi-regex": "^5.0.1",
-        "color-convert": "^2.0.1",
-        "escalade": "^3.1.1",
-        "emoji-regex": "^8.0.0",
-        "get-caller-file": "^2.0.5",
-        "ansi-styles": "^4.3.0",
-        "jsonata": "^1.8.3",
-        "lodash.camelcase": "^4.3.0",
-        "is-fullwidth-code-point": "^3.0.0",
-        "google-protobuf": "^3.19.3",
-        "strip-ansi": "^6.0.1",
-        "require-directory": "^2.1.1",
-        "long": "^4.0.0",
-        "protobufjs": "^6.11.2",
-        "uuid": "^8.3.2",
-        "typedb-client": "^2.6.2",
-        "typedb-protocol": "^2.6.1",
-        "string-width": "^4.2.3",
-        "yargs": "^16.2.0",
-        "wrap-ansi": "^7.0.0",
-        "y18n": "^5.0.8",
-        "yargs-parser": "^20.2.9",
-        "yarn": "^1.22.17"
+    "dependencies": { 
     },
     "node-red": {
+        "version": ">=2.0.0",
         "nodes": {
             "dt-action": "src/dt-action/dt-action.js",
             "dt-asset": "src/dt-asset/dt-asset.js",
@@ -66,7 +42,7 @@
         "semantic"
     ],
     "author": "Charles Steinmetz",
-    "license": "ISC",
+    "license": "MIT",
     "bugs": {
         "url": "https://github.com/steinmetz/node-red-contrib-digital-twin/issues"
     },
