@@ -1,20 +1,9 @@
+import { assert } from "console";
+import { randomUUID } from "crypto";
 import * as nodered from "node-red"
+import { stringify } from "querystring";
 import { DT } from '../resources/dt';
-
-interface DTActionNodeDef extends nodered.NodeDef {
-    bound_to: string
-}
-
-interface Node {
-    id: string,
-    type: string,
-    name: string,
-    wires: string[],
-    direction: string,
-}
-interface QueryMessage extends nodered.NodeMessage {
-    query: string
-}
+import { DTActionNodeDef, DTAssetNodeDef, DTPropertyNodeDef, DTVirtualRelationNodeDef, GraphMessage } from '../resources/types';
 
 var node: nodered.Node;
 
@@ -24,88 +13,52 @@ export = (RED: nodered.NodeAPI): void => {
 
         node = this;
 
+        // handle events coming from the editor 
+        // mainly model changes
         RED.httpNode.post('/dt-graph', (req, res) => {
 
             if (req.body.action == 'deploy') {
 
-                let nodes = JSON.parse(req.body.nodes) as Node[];
-                let assets = nodes.filter((node) => node.type == 'dt-asset');
-                var query: QueryMessage;
+                let assets: DTAssetNodeDef[] = [];
 
-                // for each asset, creates a query with its relations
-                for (let asset of assets) {
 
-                    let cypher = `MERGE (a:Asset {nodered_id: '${asset.id}'}) 
-                                    SET a.name = '${asset.name}',
-                                        a.nodered_type = '${asset.type}'`;
-
-                    let connectedNodes = nodes.filter((node) => asset.wires[0].includes(node.id));
-
-                    let label = 0;
-
-                    for (let connectedNode of connectedNodes) {
-                        if (connectedNode.type == 'dt-property') {
-                            cypher += `\nMERGE (p${label}:Property {nodered_id: '${connectedNode.id}'}) 
-                                        MERGE (a)-[:hasProperty]->(p${label}) 
-                            SET p${label}.name = '${connectedNode.name}',
-                                p${label}.nodered_type = '${connectedNode.type}'`;
-                        } else if (connectedNode.type == 'dt-action') {
-                            cypher += `\nMERGE (a${label}:Action {nodered_id: '${connectedNode.id}'}) 
-                            MERGE (a)-[:hasAction]->(a${label}) 
-                            SET a${label}.name = '${connectedNode.name}',
-                                a${label}.nodered_type = '${connectedNode.type}'`;
-                        } else if (connectedNode.type == 'dt-relation') {
-                            let relationTarget = nodes.filter((node) => connectedNode.wires[0].includes(node.id));
-                            let relationCypher = getRelationCypher(connectedNode.direction, connectedNode.name);
-                            for (let target of relationTarget) {
-                                cypher += `\nMERGE (t${label}:Asset {nodered_id: '${target.id}'})
-                                MERGE (a)${relationCypher}(t${label})
-                                SET t${label}.name = '${target.name}',
-                                    t${label}.nodered_type = '${target.type}'`;
-                                label++;
-                            }
-                        }
-                        label++;
-                    }
-                    let nodesConnectedToAsset = nodes.filter((node) => node.wires[0].includes(asset.id));
-                    for (let node of nodesConnectedToAsset) {
-                        if (node.type == 'dt-property') {
-                            cypher += `\nMERGE (p${label}:Property {nodered_id: '${node.id}'})
-                                MERGE (a)-[:hasProperty]->(p${label})
-                                SET p${label}.name = '${node.name}',
-                                    p${label}.nodered_type = '${node.type}'`;
-                        } else if (node.type == 'dt-action') {
-                            cypher += `\nMERGE (a${label}:Action {nodered_id: '${node.id}'})
-                                MERGE (a)-[:hasAction]->(a${label})
-                                SET a${label}.name = '${node.name}',
-                                    a${label}.nodered_type = '${node.type}'`;
-                        } else if (node.type == 'dt-relation') {
-                            let relationTarget = nodes.filter((node) => node.wires[0].includes(node.id));
-                            let relationCypher = getRelationCypher(node.direction, node.name);
-                            for (let target of relationTarget) {
-                                cypher += `\nMERGE (t${label}:Asset {nodered_id: '${target.id}'})
-                                    MERGE (a)${relationCypher}(t${label})
-                                    SET t${label}.name = '${target.name}',
-                                        t${label}.nodered_type = '${target.type}'`;
-                                label++;
-                            }
-                        }
-                        label++;
-                    }
-                    cypher += `\nRETURN a`;
-                    query = {
-                        query: cypher,
-                        payload: cypher,
-                    };
-                    node.send(query);
+                let nodes = JSON.parse(req.body.nodes) as any[];
+                let assetsNodes = nodes.filter(n => n.type.startsWith('dt-asset'));
+                if (assetsNodes.length == 0) {
+                    throw new Error('No assets found');
                 }
-            }
 
-            if (req.body.action == 'node_deleted') {
+
+                for (let assetNode of assetsNodes) {
+
+                    let asset = assetNode as DTAssetNodeDef;
+
+                    let outGoingConnections = nodes.filter(n => assetNode.wires[0].includes(n.id));
+                    let inComingConnections = nodes.filter(n => n.wires[0].includes(assetNode.id));
+
+                    for (let node of outGoingConnections) {
+                        processNode(asset, node);
+                    }
+                    for (let node of inComingConnections) {
+                        processNode(asset, node);
+                    }
+                    assets.push(asset);
+                }
+
+                let payload = {
+                    'assets': assets,
+                    'relations': [],
+                };
+
+                let message: GraphMessage = {
+                    payload: payload,
+                };
+                node.send(message);
+
+            } else if (req.body.action == 'node_deleted') {
                 //TODO: delete node from db 
                 //      or keep it in memory for when deploy is called
-            }
-            if (req.body.action == 'node_added') {
+            } else if (req.body.action == 'node_added') {
 
             }
         });
@@ -118,7 +71,35 @@ export = (RED: nodered.NodeAPI): void => {
     RED.nodes.registerType('dt-graph', DTGraph);
 };
 
-function  getRelationCypher(direction: string, name: string): string {
+function processNode(asset: DTAssetNodeDef, node: any) {
+    switch (node.type) {
+        case 'dt-property':
+            console.log(`${asset.name} has property ${node.name}`);
+            if (!asset.properties) asset.properties = [];
+            let virtualRelation = createVirtualRelation<DTPropertyNodeDef>(node as DTPropertyNodeDef, 'hasProperty');
+            asset.properties.push(virtualRelation);
+            break;
+        case 'dt-model':
+            break;
+        case 'dt-action':
+            break;
+        case 'dt-relation':
+            break;
+        default:
+            throw new Error(`Not allowed connection to ${node.type}`);
+    }
+}
+
+function createVirtualRelation<T>(targetNode: any, name: string) {
+    return {
+        'id': randomUUID(),
+        'name': name,
+        'direction': '-->',
+        'target': targetNode,
+    } as DTVirtualRelationNodeDef<T>;
+}
+
+function getRelationCypher(direction: string, name: string): string {
     if (direction == '-->') return `-[:${name}]->`;
     if (direction == '<--') return `<-[:${name}]-`;
     return `<-[:${name}]->`;

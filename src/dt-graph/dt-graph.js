@@ -1,6 +1,34 @@
 "use strict";
+var crypto_1 = require("crypto");
 var dt_1 = require("../resources/dt");
 var node;
+function processNode(asset, node) {
+    switch (node.type) {
+        case 'dt-property':
+            console.log("".concat(asset.name, " has property ").concat(node.name));
+            if (!asset.properties)
+                asset.properties = [];
+            var virtualRelation = createVirtualRelation(node, 'hasProperty');
+            asset.properties.push(virtualRelation);
+            break;
+        case 'dt-model':
+            break;
+        case 'dt-action':
+            break;
+        case 'dt-relation':
+            break;
+        default:
+            throw new Error("Not allowed connection to ".concat(node.type));
+    }
+}
+function createVirtualRelation(targetNode, name) {
+    return {
+        'id': (0, crypto_1.randomUUID)(),
+        'name': name,
+        'direction': '-->',
+        'target': targetNode,
+    };
+}
 function getRelationCypher(direction, name) {
     if (direction == '-->')
         return "-[:".concat(name, "]->");
@@ -12,75 +40,49 @@ module.exports = function (RED) {
     function DTGraph(config) {
         RED.nodes.createNode(this, config);
         node = this;
+        // handle events coming from the editor 
+        // mainly model changes
         RED.httpNode.post('/dt-graph', function (req, res) {
             if (req.body.action == 'deploy') {
+                var assets = [];
                 var nodes = JSON.parse(req.body.nodes);
-                var assets = nodes.filter(function (node) { return node.type == 'dt-asset'; });
-                var query;
-                var _loop_1 = function (asset) {
-                    var cypher = "MERGE (a:Asset {nodered_id: '".concat(asset.id, "'}) \n                                    SET a.name = '").concat(asset.name, "',\n                                        a.nodered_type = '").concat(asset.type, "'");
-                    var connectedNodes = nodes.filter(function (node) { return asset.wires[0].includes(node.id); });
-                    var label = 0;
-                    var _loop_2 = function (connectedNode) {
-                        if (connectedNode.type == 'dt-property') {
-                            cypher += "\nMERGE (p".concat(label, ":Property {nodered_id: '").concat(connectedNode.id, "'}) \n                                        MERGE (a)-[:hasProperty]->(p").concat(label, ") \n                            SET p").concat(label, ".name = '").concat(connectedNode.name, "',\n                                p").concat(label, ".nodered_type = '").concat(connectedNode.type, "'");
-                        }
-                        else if (connectedNode.type == 'dt-action') {
-                            cypher += "\nMERGE (a".concat(label, ":Action {nodered_id: '").concat(connectedNode.id, "'}) \n                            MERGE (a)-[:hasAction]->(a").concat(label, ") \n                            SET a").concat(label, ".name = '").concat(connectedNode.name, "',\n                                a").concat(label, ".nodered_type = '").concat(connectedNode.type, "'");
-                        }
-                        else if (connectedNode.type == 'dt-relation') {
-                            var relationTarget = nodes.filter(function (node) { return connectedNode.wires[0].includes(node.id); });
-                            var relationCypher = getRelationCypher(connectedNode.direction, connectedNode.name);
-                            for (var _d = 0, relationTarget_2 = relationTarget; _d < relationTarget_2.length; _d++) {
-                                var target = relationTarget_2[_d];
-                                cypher += "\nMERGE (t".concat(label, ":Asset {nodered_id: '").concat(target.id, "'})\n                                MERGE (a)").concat(relationCypher, "(t").concat(label, ")\n                                SET t").concat(label, ".name = '").concat(target.name, "',\n                                    t").concat(label, ".nodered_type = '").concat(target.type, "'");
-                                label++;
-                            }
-                        }
-                        label++;
-                    };
-                    for (var _a = 0, connectedNodes_1 = connectedNodes; _a < connectedNodes_1.length; _a++) {
-                        var connectedNode = connectedNodes_1[_a];
-                        _loop_2(connectedNode);
-                    }
-                    var nodesConnectedToAsset = nodes.filter(function (node) { return node.wires[0].includes(asset.id); });
-                    for (var _b = 0, nodesConnectedToAsset_1 = nodesConnectedToAsset; _b < nodesConnectedToAsset_1.length; _b++) {
-                        var node_1 = nodesConnectedToAsset_1[_b];
-                        if (node_1.type == 'dt-property') {
-                            cypher += "\nMERGE (p".concat(label, ":Property {nodered_id: '").concat(node_1.id, "'})\n                                MERGE (a)-[:hasProperty]->(p").concat(label, ")\n                                SET p").concat(label, ".name = '").concat(node_1.name, "',\n                                    p").concat(label, ".nodered_type = '").concat(node_1.type, "'");
-                        }
-                        else if (node_1.type == 'dt-action') {
-                            cypher += "\nMERGE (a".concat(label, ":Action {nodered_id: '").concat(node_1.id, "'})\n                                MERGE (a)-[:hasAction]->(a").concat(label, ")\n                                SET a").concat(label, ".name = '").concat(node_1.name, "',\n                                    a").concat(label, ".nodered_type = '").concat(node_1.type, "'");
-                        }
-                        else if (node_1.type == 'dt-relation') {
-                            var relationTarget = nodes.filter(function (node) { return node.wires[0].includes(node.id); });
-                            var relationCypher = getRelationCypher(node_1.direction, node_1.name);
-                            for (var _c = 0, relationTarget_1 = relationTarget; _c < relationTarget_1.length; _c++) {
-                                var target = relationTarget_1[_c];
-                                cypher += "\nMERGE (t".concat(label, ":Asset {nodered_id: '").concat(target.id, "'})\n                                    MERGE (a)").concat(relationCypher, "(t").concat(label, ")\n                                    SET t").concat(label, ".name = '").concat(target.name, "',\n                                        t").concat(label, ".nodered_type = '").concat(target.type, "'");
-                                label++;
-                            }
-                        }
-                        label++;
-                    }
-                    cypher += "\nRETURN a";
-                    query = {
-                        query: cypher,
-                        payload: cypher,
-                    };
-                    node.send(query);
-                };
-                // for each asset, creates a query with its relations
-                for (var _i = 0, assets_1 = assets; _i < assets_1.length; _i++) {
-                    var asset = assets_1[_i];
-                    _loop_1(asset);
+                var assetsNodes = nodes.filter(function (n) { return n.type.startsWith('dt-asset'); });
+                if (assetsNodes.length == 0) {
+                    throw new Error('No assets found');
                 }
+                var _loop_1 = function (assetNode) {
+                    var asset = assetNode;
+                    var outGoingConnections = nodes.filter(function (n) { return assetNode.wires[0].includes(n.id); });
+                    var inComingConnections = nodes.filter(function (n) { return n.wires[0].includes(assetNode.id); });
+                    for (var _a = 0, outGoingConnections_1 = outGoingConnections; _a < outGoingConnections_1.length; _a++) {
+                        var node_1 = outGoingConnections_1[_a];
+                        processNode(asset, node_1);
+                    }
+                    for (var _b = 0, inComingConnections_1 = inComingConnections; _b < inComingConnections_1.length; _b++) {
+                        var node_2 = inComingConnections_1[_b];
+                        processNode(asset, node_2);
+                    }
+                    console.log(JSON.stringify(asset));
+                    assets.push(asset);
+                };
+                for (var _i = 0, assetsNodes_1 = assetsNodes; _i < assetsNodes_1.length; _i++) {
+                    var assetNode = assetsNodes_1[_i];
+                    _loop_1(assetNode);
+                }
+                var payload = {
+                    'assets': assets,
+                    'relations': [],
+                };
+                var message = {
+                    payload: payload,
+                };
+                node.send(message);
             }
-            if (req.body.action == 'node_deleted') {
+            else if (req.body.action == 'node_deleted') {
                 //TODO: delete node from db 
                 //      or keep it in memory for when deploy is called
             }
-            if (req.body.action == 'node_added') {
+            else if (req.body.action == 'node_added') {
             }
         });
         dt_1.DT.events.on(dt_1.DT.eventNames.updateAsset, function (msg) {

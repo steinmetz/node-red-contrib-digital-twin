@@ -1,11 +1,12 @@
 import * as nodered from "node-red"
-
-interface DTRelationNodeDef extends nodered.NodeDef {
-    direction: string, //-->, <--, <-->
-}
+import { DTRelationNode, DTRelationNodeDef } from "../resources/types";
+ 
 
 export = (RED: nodered.NodeAPI): void => {
-    function DTRelation(this: nodered.Node, config: DTRelationNodeDef): void {
+    function DTRelation(this: DTRelationNode, config: DTRelationNodeDef): void {
+
+        this.isVirtual = false;
+
         RED.nodes.createNode(this, config);
 
         this.on('input', (msg: any, send, done): void => {
