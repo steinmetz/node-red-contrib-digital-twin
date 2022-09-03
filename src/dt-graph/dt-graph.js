@@ -1,34 +1,48 @@
 "use strict";
-var crypto_1 = require("crypto");
 var dt_1 = require("../resources/dt");
 var node;
-function processNode(asset, node) {
+function processNode(asset, node, nodes, relationsMap) {
     switch (node.type) {
         case 'dt-property':
-            console.log("".concat(asset.name, " has property ").concat(node.name));
             if (!asset.properties)
                 asset.properties = [];
-            var virtualRelation = createVirtualRelation(node, 'hasProperty');
-            asset.properties.push(virtualRelation);
+            asset.properties.push(node);
+            break;
+        case 'dt-action':
+            if (!asset.actions)
+                asset.actions = [];
+            asset.actions.push(node);
+            break;
+        case 'dt-event':
             break;
         case 'dt-model':
             break;
-        case 'dt-action':
-            break;
         case 'dt-relation':
+            if (node.type == 'dt-relation') {
+                var outgoingNodes = nodes.find(function (n) { return node.wires[0].includes(n.id); });
+                var incomingNodes = nodes.find(function (n) { return n.wires[0].includes(asset.id); });
+                relationsMap.set(node.id, {
+                    id: node.id,
+                    name: node.name,
+                    direction: node.direction,
+                    origins: [incomingNodes],
+                    targets: [outgoingNodes]
+                });
+            }
             break;
         default:
             throw new Error("Not allowed connection to ".concat(node.type));
     }
 }
-function createVirtualRelation(targetNode, name) {
-    return {
-        'id': (0, crypto_1.randomUUID)(),
-        'name': name,
-        'direction': '-->',
-        'target': targetNode,
-    };
-}
+// is it necessary?
+// function createVirtualRelation<T>(targetNode: any, name: string) {
+//     return {
+//         'id': randomUUID(),
+//         'name': name,
+//         'direction': '-->',
+//         'target': targetNode,
+//     } as DTVirtualRelationNodeDef<T>;
+// }
 function getRelationCypher(direction, name) {
     if (direction == '-->')
         return "-[:".concat(name, "]->");
@@ -45,6 +59,8 @@ module.exports = function (RED) {
         RED.httpNode.post('/dt-graph', function (req, res) {
             if (req.body.action == 'deploy') {
                 var assets = [];
+                var relations = [];
+                var relationsMap = new Map();
                 var nodes = JSON.parse(req.body.nodes);
                 var assetsNodes = nodes.filter(function (n) { return n.type.startsWith('dt-asset'); });
                 if (assetsNodes.length == 0) {
@@ -56,22 +72,23 @@ module.exports = function (RED) {
                     var inComingConnections = nodes.filter(function (n) { return n.wires[0].includes(assetNode.id); });
                     for (var _a = 0, outGoingConnections_1 = outGoingConnections; _a < outGoingConnections_1.length; _a++) {
                         var node_1 = outGoingConnections_1[_a];
-                        processNode(asset, node_1);
+                        processNode(asset, node_1, nodes, relationsMap);
                     }
                     for (var _b = 0, inComingConnections_1 = inComingConnections; _b < inComingConnections_1.length; _b++) {
                         var node_2 = inComingConnections_1[_b];
-                        processNode(asset, node_2);
+                        processNode(asset, node_2, nodes, relationsMap);
                     }
-                    console.log(JSON.stringify(asset));
                     assets.push(asset);
                 };
                 for (var _i = 0, assetsNodes_1 = assetsNodes; _i < assetsNodes_1.length; _i++) {
                     var assetNode = assetsNodes_1[_i];
                     _loop_1(assetNode);
                 }
+                console.log(relationsMap.values());
+                console.log(relationsMap.entries());
                 var payload = {
                     'assets': assets,
-                    'relations': [],
+                    'relations': Array.from(relationsMap.values()),
                 };
                 var message = {
                     payload: payload,

@@ -3,7 +3,7 @@ import { randomUUID } from "crypto";
 import * as nodered from "node-red"
 import { stringify } from "querystring";
 import { DT } from '../resources/dt';
-import { DTActionNodeDef, DTAssetNodeDef, DTPropertyNodeDef, DTVirtualRelationNodeDef, GraphMessage } from '../resources/types';
+import { DTActionNodeDef, DTAssetNodeDef, DTPropertyNodeDef, DTRelationNodeDef, GraphMessage } from '../resources/types';
 
 var node: nodered.Node;
 
@@ -20,7 +20,7 @@ export = (RED: nodered.NodeAPI): void => {
             if (req.body.action == 'deploy') {
 
                 let assets: DTAssetNodeDef[] = [];
-
+                let relationsMap = new Map<string, any>();
 
                 let nodes = JSON.parse(req.body.nodes) as any[];
                 let assetsNodes = nodes.filter(n => n.type.startsWith('dt-asset'));
@@ -37,17 +37,17 @@ export = (RED: nodered.NodeAPI): void => {
                     let inComingConnections = nodes.filter(n => n.wires[0].includes(assetNode.id));
 
                     for (let node of outGoingConnections) {
-                        processNode(asset, node);
+                        processNode(asset, node, nodes, relationsMap);
                     }
                     for (let node of inComingConnections) {
-                        processNode(asset, node);
+                        processNode(asset, node, nodes, relationsMap);
                     }
                     assets.push(asset);
                 }
 
                 let payload = {
                     'assets': assets,
-                    'relations': [],
+                    'relations': Array.from(relationsMap.values()),
                 };
 
                 let message: GraphMessage = {
@@ -71,36 +71,38 @@ export = (RED: nodered.NodeAPI): void => {
     RED.nodes.registerType('dt-graph', DTGraph);
 };
 
-function processNode(asset: DTAssetNodeDef, node: any) {
+function processNode(asset: DTAssetNodeDef, node: any, nodes: any[], relationsMap: Map<string, any>) {
     switch (node.type) {
         case 'dt-property':
-            console.log(`${asset.name} has property ${node.name}`);
             if (!asset.properties) asset.properties = [];
-            let virtualRelation = createVirtualRelation<DTPropertyNodeDef>(node as DTPropertyNodeDef, 'hasProperty');
-            asset.properties.push(virtualRelation);
+            asset.properties.push(node as DTPropertyNodeDef);
+            break;
+        case 'dt-action':
+            if (!asset.actions) asset.actions = [];
+            asset.actions.push(node as DTPropertyNodeDef);
+            break;
+        case 'dt-event':
             break;
         case 'dt-model':
             break;
-        case 'dt-action':
-            break;
         case 'dt-relation':
+            if (node.type == 'dt-relation') {
+                let outgoingNodes = nodes.find(n => node.wires[0].includes(n.id));
+                let incomingNodes = nodes.find(n => n.wires[0].includes(asset.id));
+
+                relationsMap.set(
+                    node.id,
+                    {
+                        id: node.id,
+                        name: node.name,
+                        direction: node.direction,
+                        origins: [incomingNodes],
+                        targets: [outgoingNodes]
+                    } as DTRelationNodeDef
+                );
+            }
             break;
         default:
             throw new Error(`Not allowed connection to ${node.type}`);
     }
-}
-
-function createVirtualRelation<T>(targetNode: any, name: string) {
-    return {
-        'id': randomUUID(),
-        'name': name,
-        'direction': '-->',
-        'target': targetNode,
-    } as DTVirtualRelationNodeDef<T>;
-}
-
-function getRelationCypher(direction: string, name: string): string {
-    if (direction == '-->') return `-[:${name}]->`;
-    if (direction == '<--') return `<-[:${name}]-`;
-    return `<-[:${name}]->`;
 }

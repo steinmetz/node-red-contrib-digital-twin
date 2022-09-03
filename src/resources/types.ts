@@ -33,7 +33,9 @@ export interface DTNodeDef extends nodered.NodeDef {
   */
 export interface DTAssetNodeDef extends DTNodeDef { 
   aDTType: string;
-  properties: DTVirtualRelationNodeDef<DTPropertyNodeDef>[];  
+  properties: DTPropertyNodeDef[];  
+  actions: DTActionNodeDef[];  
+  events: DTEventNodeDef[];  
 }
 
 export interface DTModelNodeDef extends DTNodeDef { }
@@ -42,8 +44,12 @@ export interface DTPropertyNodeDef extends DTNodeDef { }
 
 export interface DTActionNodeDef extends DTNodeDef { }
 
+export interface DTEventNodeDef extends DTNodeDef { }
+
 export interface DTRelationNodeDef extends DTNodeDef {
   direction: string, //-->, <--, <-->
+  origins?: DTNodeDef[],
+  targets?: DTNodeDef[],
 }
 export interface DTVirtualRelationNodeDef<T> {
   id: string;
