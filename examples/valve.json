@@ -35,14 +35,6 @@
         "info": ""
     },
     {
-        "id": "db093473.bf6418",
-        "type": "neo4j-bolt-server",
-        "name": "",
-        "url": "neo4j+s://0d0d3235.databases.neo4j.io:7687",
-        "user": "neo4j",
-        "pass": "81k8CDRUOU0o7bg165Jn_YPSzrSmZFTUzHEYai5Tnh0"
-    },
-    {
         "id": "c579d4a.2ab9828",
         "type": "dt-asset",
         "z": "d7c51fb8.7b04b",
