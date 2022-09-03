@@ -1,0 +1,310 @@
+[
+    {
+        "id": "d7c51fb8.7b04b",
+        "type": "tab",
+        "label": "dt-valve",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "8e345571.f2ff08",
+        "type": "tab",
+        "label": "IoTSensor",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "b5ea6d2a.6e7bb",
+        "type": "tab",
+        "label": "openValve",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "1faeff1.8709701",
+        "type": "tab",
+        "label": "closeValve",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "919374fb.f2e4d8",
+        "type": "tab",
+        "label": "knowledgeGraph",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "db093473.bf6418",
+        "type": "neo4j-bolt-server",
+        "name": "",
+        "url": "neo4j+s://0d0d3235.databases.neo4j.io:7687",
+        "user": "neo4j",
+        "pass": "81k8CDRUOU0o7bg165Jn_YPSzrSmZFTUzHEYai5Tnh0"
+    },
+    {
+        "id": "c579d4a.2ab9828",
+        "type": "dt-asset",
+        "z": "d7c51fb8.7b04b",
+        "name": "valve",
+        "x": 570,
+        "y": 300,
+        "wires": [
+            [
+                "dd7c3eb9.0e60f",
+                "6099f9fd.727cd8"
+            ]
+        ]
+    },
+    {
+        "id": "c1f7e930.6f8e48",
+        "type": "dt-graph",
+        "z": "d7c51fb8.7b04b",
+        "name": "",
+        "x": 140,
+        "y": 40,
+        "wires": [
+            [
+                "96ceb3a9.0c37f"
+            ]
+        ]
+    },
+    {
+        "id": "dd7c3eb9.0e60f",
+        "type": "dt-action",
+        "z": "d7c51fb8.7b04b",
+        "name": "open",
+        "x": 750,
+        "y": 360,
+        "wires": [
+            [
+                "e4f3ce6c.cdef3"
+            ]
+        ]
+    },
+    {
+        "id": "1f2c5791.f481f8",
+        "type": "dt-asset",
+        "z": "d7c51fb8.7b04b",
+        "name": "refinery",
+        "x": 960,
+        "y": 240,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "6099f9fd.727cd8",
+        "type": "dt-relation",
+        "z": "d7c51fb8.7b04b",
+        "name": "partOf",
+        "direction": "-->",
+        "x": 770,
+        "y": 240,
+        "wires": [
+            [
+                "1f2c5791.f481f8"
+            ]
+        ]
+    },
+    {
+        "id": "d3443574.82fdd8",
+        "type": "link in",
+        "z": "d7c51fb8.7b04b",
+        "name": "temperatureIoT",
+        "links": [
+            "f45a326d.f215e"
+        ],
+        "x": 205,
+        "y": 300,
+        "wires": [
+            [
+                "fd18d254.15a17"
+            ]
+        ]
+    },
+    {
+        "id": "e4f3ce6c.cdef3",
+        "type": "link out",
+        "z": "d7c51fb8.7b04b",
+        "name": "",
+        "mode": "link",
+        "links": [
+            "e2944604.ae2808"
+        ],
+        "x": 865,
+        "y": 360,
+        "wires": []
+    },
+    {
+        "id": "96ceb3a9.0c37f",
+        "type": "link out",
+        "z": "d7c51fb8.7b04b",
+        "name": "",
+        "mode": "link",
+        "links": [
+            "6b2dc0ae.f4125"
+        ],
+        "x": 295,
+        "y": 40,
+        "wires": []
+    },
+    {
+        "id": "fd18d254.15a17",
+        "type": "dt-property",
+        "z": "d7c51fb8.7b04b",
+        "name": "temperature",
+        "x": 350,
+        "y": 300,
+        "wires": [
+            [
+                "c579d4a.2ab9828"
+            ]
+        ]
+    },
+    {
+        "id": "dfee121.a89eff",
+        "type": "inject",
+        "z": "8e345571.f2ff08",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "5",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "33.6",
+        "payloadType": "num",
+        "x": 510,
+        "y": 300,
+        "wires": [
+            [
+                "f45a326d.f215e"
+            ]
+        ]
+    },
+    {
+        "id": "f45a326d.f215e",
+        "type": "link out",
+        "z": "8e345571.f2ff08",
+        "name": "temperatureIoT",
+        "mode": "link",
+        "links": [
+            "d3443574.82fdd8",
+            "10a389e0.2f3dc6",
+            "8d36c7af.de46b8",
+            "7976ab48.4f1fb4",
+            "e91b576d.bd67b8",
+            "ad10d05f.6cd54",
+            "71a1576f.bd7788"
+        ],
+        "x": 735,
+        "y": 300,
+        "wires": []
+    },
+    {
+        "id": "e2944604.ae2808",
+        "type": "link in",
+        "z": "b5ea6d2a.6e7bb",
+        "name": "openValve",
+        "links": [
+            "e4f3ce6c.cdef3"
+        ],
+        "x": 285,
+        "y": 320,
+        "wires": [
+            [
+                "bfa42de9.4a7b8"
+            ]
+        ]
+    },
+    {
+        "id": "bfa42de9.4a7b8",
+        "type": "debug",
+        "z": "b5ea6d2a.6e7bb",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 610,
+        "y": 320,
+        "wires": []
+    },
+    {
+        "id": "7721b87b.3899a8",
+        "type": "link in",
+        "z": "1faeff1.8709701",
+        "name": "closeValve",
+        "links": [
+            "b335d849.8992a8"
+        ],
+        "x": 305,
+        "y": 340,
+        "wires": [
+            [
+                "503d895f.1edba8"
+            ]
+        ]
+    },
+    {
+        "id": "503d895f.1edba8",
+        "type": "debug",
+        "z": "1faeff1.8709701",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 570,
+        "y": 340,
+        "wires": []
+    },
+    {
+        "id": "6b2dc0ae.f4125",
+        "type": "link in",
+        "z": "919374fb.f2e4d8",
+        "name": "knowledgeGraph",
+        "links": [
+            "96ceb3a9.0c37f"
+        ],
+        "x": 365,
+        "y": 280,
+        "wires": [
+            [
+                "efdd01b0.a21af"
+            ]
+        ]
+    },
+    {
+        "id": "efdd01b0.a21af",
+        "type": "debug",
+        "z": "919374fb.f2e4d8",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": true,
+        "tostatus": true,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "payload",
+        "statusType": "auto",
+        "x": 700,
+        "y": 280,
+        "wires": []
+    }
+]
