@@ -34,22 +34,6 @@ function processNode(asset, node, nodes, relationsMap) {
             throw new Error("Not allowed connection to ".concat(node.type));
     }
 }
-// is it necessary?
-// function createVirtualRelation<T>(targetNode: any, name: string) {
-//     return {
-//         'id': randomUUID(),
-//         'name': name,
-//         'direction': '-->',
-//         'target': targetNode,
-//     } as DTVirtualRelationNodeDef<T>;
-// }
-function getRelationCypher(direction, name) {
-    if (direction == '-->')
-        return "-[:".concat(name, "]->");
-    if (direction == '<--')
-        return "<-[:".concat(name, "]-");
-    return "<-[:".concat(name, "]->");
-}
 module.exports = function (RED) {
     function DTGraph(config) {
         RED.nodes.createNode(this, config);
@@ -59,7 +43,6 @@ module.exports = function (RED) {
         RED.httpNode.post('/dt-graph', function (req, res) {
             if (req.body.action == 'deploy') {
                 var assets = [];
-                var relations = [];
                 var relationsMap = new Map();
                 var nodes = JSON.parse(req.body.nodes);
                 var assetsNodes = nodes.filter(function (n) { return n.type.startsWith('dt-asset'); });
@@ -84,8 +67,6 @@ module.exports = function (RED) {
                     var assetNode = assetsNodes_1[_i];
                     _loop_1(assetNode);
                 }
-                console.log(relationsMap.values());
-                console.log(relationsMap.entries());
                 var payload = {
                     'assets': assets,
                     'relations': Array.from(relationsMap.values()),
