@@ -87,5 +87,5 @@ interface DTNodeMessage<T> extends nodered.NodeMessage {
 export interface DTPropertyNodeMessage extends DTNodeMessage<DTPropertyNode> { }
 
 export interface GraphMessage extends nodered.NodeMessage {
-  cypher?: string,
+  cypher?: string[],
 }

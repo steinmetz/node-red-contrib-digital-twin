@@ -1,14 +1,12 @@
 {
     "name": "@digitaltwins/node-red-contrib-digital-twin",
-    "version": "0.0.5",
+    "version": "0.0.6",
     "description": "Nodes for modeling Digital Twins",
     "directories": {
         "example": "examples"
     },
-    "dependencies": { 
-    },
+    "dependencies": {},
     "node-red": {
-        "version": ">=2.0.0",
         "nodes": {
             "dt-action": "src/dt-action/dt-action.js",
             "dt-asset": "src/dt-asset/dt-asset.js",
@@ -17,7 +15,8 @@
             "dt-property": "src/dt-property/dt-property.js",
             "dt-relation": "src/dt-relation/dt-relation.js",
             "dt-model": "src/dt-model/dt-model.js"
-        }
+        },
+        "version": ">=1.3.0"
     },
     "devDependencies": {
         "@tsconfig/node16": "^1.0.2",
@@ -46,5 +45,8 @@
     "bugs": {
         "url": "https://github.com/steinmetz/node-red-contrib-digital-twin/issues"
     },
-    "homepage": "https://github.com/steinmetz/node-red-contrib-digital-twin#readme"
+    "homepage": "https://github.com/steinmetz/node-red-contrib-digital-twin#readme",
+    "engines": {
+        "node": ">=14.17.0"
+    }
 }
