@@ -3,6 +3,7 @@ var dt_1 = require("../resources/dt");
 var cypher_1 = require("../resources/cypher");
 var cypherConverter = new cypher_1.Cypher();
 var graphNode;
+var deletedNodes = [];
 function processNode(asset, node, nodes, relationsMap) {
     switch (node.type) {
         case 'dt-property':
@@ -16,6 +17,9 @@ function processNode(asset, node, nodes, relationsMap) {
             asset.actions.push(node);
             break;
         case 'dt-event':
+            if (!asset.events)
+                asset.actions = [];
+            asset.events.push(node);
             break;
         case 'dt-model':
             break;
@@ -38,6 +42,9 @@ function processNode(asset, node, nodes, relationsMap) {
 }
 function modelToCypher(assets, relations) {
     return cypherConverter.convertAssetsRelations(assets, relations);
+}
+function deletedNodesCypher(nodes) {
+    return cypherConverter.deletedNodesCypher(nodes);
 }
 function propertyToCypher(propertyNode) {
     return [cypherConverter.createDataPropertyCypher(propertyNode)];
@@ -73,10 +80,12 @@ module.exports = function (RED) {
             }
             var relations = Array.from(relationsMap.values());
             var cypher = modelToCypher(assets, relations);
+            cypher.push.apply(cypher, []);
             var payload = {
                 'model': {
                     'assets': assets,
                     'relations': relations,
+                    'deletedNodes': deletedNodes
                 },
                 'cypher': cypher
             };
@@ -86,11 +95,13 @@ module.exports = function (RED) {
             graphNode.send(message);
         }
         else if (req.body.action == 'node_deleted') {
+            deletedNodes.push(req.body.node);
             //TODO: delete node from db 
             //      or keep it in memory for when deploy is called
         }
         else if (req.body.action == 'node_added') {
         }
+        deletedNodes = [];
         res.sendStatus(200);
     });
     dt_1.DT.events.on(dt_1.DT.eventNames.updateAsset, function (msg) {

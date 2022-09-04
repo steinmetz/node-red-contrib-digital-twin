@@ -16,6 +16,14 @@ var Cypher = /** @class */ (function () {
     Cypher.prototype.convertAssetsRelations = function (assets, relations) {
         return __spreadArray(__spreadArray([], this.createAssetsCypher(assets), true), this.createRelationsCypher(relations), true);
     };
+    Cypher.prototype.deletedNodesCypher = function (nodes) {
+        var cypher = [];
+        for (var _i = 0, nodes_1 = nodes; _i < nodes_1.length; _i++) {
+            var node = nodes_1[_i];
+            cypher.push("MATCH (n:".concat(node.label, " {id: \"").concat(node.id, "\"}) DETACH DELETE n"));
+        }
+        return cypher;
+    };
     Cypher.prototype.createAssetsCypher = function (assets) {
         var propertyRelationName = 'hasProperty';
         var actionRelationName = 'hasAction';

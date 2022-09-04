@@ -21,6 +21,12 @@
         $.post('/dt-graph', {nodes: nodes, action: 'deploy'});
     });
 
+    RED.events.on("nodes:remove", function(node) {
+        if(node.type.startsWith('dt-')){
+            $.post('/dt-graph', {node: node, action: 'node_deleted'});
+        }
+    });
+
 </script>
 
 <script type="text/html" data-template-name="dt-graph">

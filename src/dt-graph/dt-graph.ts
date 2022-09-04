@@ -1,12 +1,13 @@
 import * as nodered from "node-red"
 import { DT } from '../resources/dt';
-import { DTActionNodeDef, DTAssetNodeDef, DTPropertyNodeDef, DTRelationNodeDef, GraphMessage } from '../resources/types';
+import { DTActionNodeDef, DTAssetNodeDef, DTEventNodeDef, DTNodeDef, DTPropertyNodeDef, DTRelationNodeDef, GraphMessage } from '../resources/types';
 import { Cypher } from '../resources/cypher';
 
 const cypherConverter = new Cypher();
 
 
 var graphNode: nodered.Node;
+var deletedNodes : DTNodeDef[] = [];
 
 export = (RED: nodered.NodeAPI): void => {
 
@@ -42,10 +43,12 @@ export = (RED: nodered.NodeAPI): void => {
             }
             let relations = Array.from(relationsMap.values());
             let cypher = modelToCypher(assets, relations);
+            cypher.push(...[]);
             let payload = {
                 'model': {
                     'assets': assets,
                     'relations': relations,
+                    'deletedNodes': deletedNodes
                 },
                 'cypher': cypher
             };
@@ -56,11 +59,13 @@ export = (RED: nodered.NodeAPI): void => {
             graphNode.send(message);
 
         } else if (req.body.action == 'node_deleted') {
+            deletedNodes.push(req.body.node);
             //TODO: delete node from db 
             //      or keep it in memory for when deploy is called
         } else if (req.body.action == 'node_added') {
 
         }
+        deletedNodes = [];
         res.sendStatus(200);
     });
 
@@ -98,9 +103,11 @@ function processNode(asset: DTAssetNodeDef, node: any, nodes: any[], relationsMa
             break;
         case 'dt-action':
             if (!asset.actions) asset.actions = [];
-            asset.actions.push(node as DTPropertyNodeDef);
+            asset.actions.push(node as DTActionNodeDef);
             break;
         case 'dt-event':
+            if (!asset.events) asset.actions = [];
+            asset.events.push(node as DTEventNodeDef);
             break;
         case 'dt-model':
             break;
@@ -129,6 +136,10 @@ function processNode(asset: DTAssetNodeDef, node: any, nodes: any[], relationsMa
 
 function modelToCypher(assets: DTAssetNodeDef[], relations: DTRelationNodeDef[]) {
     return cypherConverter.convertAssetsRelations(assets, relations);
+}
+
+function deletedNodesCypher(nodes: DTNodeDef[]) {
+    return cypherConverter.deletedNodesCypher(nodes);
 }
 
 function propertyToCypher(propertyNode: DTPropertyNodeDef) {

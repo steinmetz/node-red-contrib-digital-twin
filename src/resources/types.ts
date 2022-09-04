@@ -31,22 +31,25 @@ export interface DTNodeDef extends nodered.NodeDef {
   *     defined by ISO23247: Product, Equipment, Material, Process, Facility,
   *                          Environment, Personnel, SupportingDocuments
   */
-export interface DTAssetNodeDef extends DTNodeDef { 
+export interface DTAssetNodeDef extends DTNodeDef {
   aDTType: string;
-  properties: DTPropertyNodeDef[];  
-  actions: DTActionNodeDef[];  
-  events: DTEventNodeDef[];  
+  properties: DTPropertyNodeDef[];
+  actions: DTActionNodeDef[];
+  events: DTEventNodeDef[];
 }
 
-export interface DTModelNodeDef extends DTNodeDef { }
+export interface DTModelNodeDef extends DTNodeDef {
+}
 
 export interface DTPropertyNodeDef extends DTNodeDef {
   value: any;
- }
+}
 
-export interface DTActionNodeDef extends DTNodeDef { }
+export interface DTActionNodeDef extends DTNodeDef {
+}
 
-export interface DTEventNodeDef extends DTNodeDef { }
+export interface DTEventNodeDef extends DTNodeDef {
+}
 
 export interface DTRelationNodeDef extends DTNodeDef {
   direction: string, //-->, <--, <-->
@@ -68,6 +71,8 @@ export interface DTNode extends nodered.Node {
   aDTType: string[];
   accessGroup: string;
 }
+export interface DTAssetNode extends DTNode {
+}
 export interface DTPropertyNode extends DTNode {
   value: any;
 }
@@ -79,7 +84,7 @@ export interface DTRelationNode extends DTNode {
 
 
 // Message types
-export interface DTPropertyNodeMessage extends nodered.NodeMessage{ }
+export interface DTPropertyNodeMessage extends nodered.NodeMessage { }
 
 export interface GraphMessage extends nodered.NodeMessage {
   cypher?: string[],

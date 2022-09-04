@@ -1,4 +1,4 @@
-import { DTAssetNodeDef, DTPropertyNodeDef, DTRelationNodeDef } from "./types";
+import { DTAssetNodeDef, DTNodeDef, DTPropertyNodeDef, DTRelationNodeDef } from "./types";
 
 export class Cypher {
     convertAssetsRelations(assets: DTAssetNodeDef[], relations: DTRelationNodeDef[]) {
@@ -7,6 +7,23 @@ export class Cypher {
             ...this.createRelationsCypher(relations)
         ];
 
+    }
+
+    // TODO: just set the node as deleted and not delete it
+    deletedNodesCypher(nodes: DTNodeDef[]) {
+        let cypher: string[] = [];
+        for (let node of nodes) {
+            if (node.type == 'dt-asset') {
+                cypher.push(`MATCH (n:Asset {nodered_id: "${node.id}"}) DETACH DELETE n`);
+            } else if (node.type == 'dt-property') {
+                cypher.push(`MATCH (n:Property {nodered_id: "${node.id}"}) DETACH DELETE n`);
+            } else if (node.type == 'dt-action') {
+                cypher.push(`MATCH (n:Action {nodered_id: "${node.id}"}) DETACH DELETE n`);
+            } else if (node.type == 'dt-event') {
+                cypher.push(`MATCH (n:Event {nodered_id: "${node.id}"}) DETACH DELETE n`);
+            }
+        }
+        return cypher;
     }
 
     createAssetsCypher(assets: DTAssetNodeDef[]) {
