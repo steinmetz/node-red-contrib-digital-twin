@@ -1,6 +1,7 @@
 "use strict";
 var dt_1 = require("../resources/dt");
 var cypher_1 = require("../resources/cypher");
+var cypherConverter = new cypher_1.Cypher();
 var graphNode;
 function processNode(asset, node, nodes, relationsMap) {
     switch (node.type) {
@@ -35,12 +36,14 @@ function processNode(asset, node, nodes, relationsMap) {
             throw new Error("Not allowed connection to ".concat(node.type));
     }
 }
-function toCypher(assets, relations) {
-    var converter = new cypher_1.Cypher();
-    var cypher = converter.convertAssetsRelations(assets, relations);
-    return cypher;
+function modelToCypher(assets, relations) {
+    return cypherConverter.convertAssetsRelations(assets, relations);
+}
+function propertyToCypher(propertyNode) {
+    return [cypherConverter.createDataPropertyCypher(propertyNode)];
 }
 module.exports = function (RED) {
+    // receive updates from the Editor (model changes)
     RED.httpNode.post('/dt-graph', function (req, res) {
         if (req.body.action == 'deploy') {
             var assets = [];
@@ -69,10 +72,12 @@ module.exports = function (RED) {
                 _loop_1(assetNode);
             }
             var relations = Array.from(relationsMap.values());
-            var cypher = toCypher(assets, relations);
+            var cypher = modelToCypher(assets, relations);
             var payload = {
-                'assets': assets,
-                'relations': relations,
+                'model': {
+                    'assets': assets,
+                    'relations': relations,
+                },
                 'cypher': cypher
             };
             var message = {
@@ -89,7 +94,19 @@ module.exports = function (RED) {
         res.sendStatus(200);
     });
     dt_1.DT.events.on(dt_1.DT.eventNames.updateAsset, function (msg) {
-        //TODO: update asset in graph
+        var property = msg.property;
+        var cypher = propertyToCypher(property);
+        var payload = {
+            'data': {
+                'asset_id': msg.assetId,
+                'property': property
+            },
+            'cypher': cypher
+        };
+        var message = {
+            payload: payload,
+        };
+        graphNode.send(message);
     });
     function DTGraph(config) {
         RED.nodes.createNode(this, config);

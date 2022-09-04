@@ -1,5 +1,4 @@
 "use strict";
-var crypto_1 = require("crypto");
 module.exports = function (RED) {
     function DTProperty(config) {
         RED.nodes.createNode(this, config);
@@ -10,8 +9,7 @@ module.exports = function (RED) {
         this.on('input', function (msg, send, done) {
             node.value = msg.payload;
             var data = {
-                id: (0, crypto_1.randomUUID)(),
-                content: node,
+                payload: node,
             };
             send(data);
         });

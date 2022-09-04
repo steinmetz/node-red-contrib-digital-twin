@@ -6,7 +6,7 @@ module.exports = function (RED) {
         RED.nodes.createNode(this, config);
         this.on('input', function (msg, send, done) {
             dt_1.DT.events.emit(dt_1.DT.eventNames.updateAsset, {
-                property: msg,
+                property: msg.payload,
                 assetId: _this.id,
             });
         });

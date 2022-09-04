@@ -9,7 +9,7 @@ export = (RED: nodered.NodeAPI): void => {
             DT.events.emit(
                 DT.eventNames.updateAsset,
                 {
-                    property: msg,
+                    property: msg.payload,
                     assetId: this.id,
                 }
             );

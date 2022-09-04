@@ -39,8 +39,10 @@
         "type": "dt-asset",
         "z": "d7c51fb8.7b04b",
         "name": "valve",
-        "x": 570,
-        "y": 300,
+        "aContext": "",
+        "aId": "",
+        "x": 550,
+        "y": 220,
         "wires": [
             [
                 "dd7c3eb9.0e60f",
@@ -49,12 +51,25 @@
         ]
     },
     {
+        "id": "fd18d254.15a17",
+        "type": "dt-property",
+        "z": "d7c51fb8.7b04b",
+        "name": "temperature",
+        "x": 330,
+        "y": 220,
+        "wires": [
+            [
+                "c579d4a.2ab9828"
+            ]
+        ]
+    },
+    {
         "id": "c1f7e930.6f8e48",
         "type": "dt-graph",
         "z": "d7c51fb8.7b04b",
         "name": "",
-        "x": 140,
-        "y": 40,
+        "x": 260,
+        "y": 60,
         "wires": [
             [
                 "96ceb3a9.0c37f"
@@ -66,8 +81,8 @@
         "type": "dt-action",
         "z": "d7c51fb8.7b04b",
         "name": "open",
-        "x": 750,
-        "y": 360,
+        "x": 730,
+        "y": 300,
         "wires": [
             [
                 "e4f3ce6c.cdef3"
@@ -79,8 +94,8 @@
         "type": "dt-asset",
         "z": "d7c51fb8.7b04b",
         "name": "refinery",
-        "x": 960,
-        "y": 240,
+        "x": 980,
+        "y": 160,
         "wires": [
             []
         ]
@@ -91,8 +106,8 @@
         "z": "d7c51fb8.7b04b",
         "name": "partOf",
         "direction": "-->",
-        "x": 770,
-        "y": 240,
+        "x": 750,
+        "y": 160,
         "wires": [
             [
                 "1f2c5791.f481f8"
@@ -107,8 +122,8 @@
         "links": [
             "f45a326d.f215e"
         ],
-        "x": 205,
-        "y": 300,
+        "x": 185,
+        "y": 220,
         "wires": [
             [
                 "fd18d254.15a17"
@@ -124,8 +139,8 @@
         "links": [
             "e2944604.ae2808"
         ],
-        "x": 865,
-        "y": 360,
+        "x": 845,
+        "y": 300,
         "wires": []
     },
     {
@@ -137,28 +152,15 @@
         "links": [
             "6b2dc0ae.f4125"
         ],
-        "x": 295,
-        "y": 40,
+        "x": 415,
+        "y": 60,
         "wires": []
-    },
-    {
-        "id": "fd18d254.15a17",
-        "type": "dt-property",
-        "z": "d7c51fb8.7b04b",
-        "name": "temperature",
-        "x": 350,
-        "y": 300,
-        "wires": [
-            [
-                "c579d4a.2ab9828"
-            ]
-        ]
     },
     {
         "id": "dfee121.a89eff",
         "type": "inject",
         "z": "8e345571.f2ff08",
-        "name": "",
+        "name": "IoT sensor",
         "props": [
             {
                 "p": "payload"
@@ -175,7 +177,7 @@
         "topic": "",
         "payload": "33.6",
         "payloadType": "num",
-        "x": 510,
+        "x": 360,
         "y": 300,
         "wires": [
             [
@@ -274,11 +276,12 @@
         "links": [
             "96ceb3a9.0c37f"
         ],
-        "x": 365,
-        "y": 280,
+        "x": 195,
+        "y": 300,
         "wires": [
             [
-                "efdd01b0.a21af"
+                "09fc455c258ec2f7",
+                "a9f5c2c18c000b22"
             ]
         ]
     },
@@ -286,17 +289,107 @@
         "id": "efdd01b0.a21af",
         "type": "debug",
         "z": "919374fb.f2e4d8",
-        "name": "",
+        "name": "cypher for neo4j",
         "active": true,
         "tosidebar": true,
-        "console": true,
-        "tostatus": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "query",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1080,
+        "y": 300,
+        "wires": []
+    },
+    {
+        "id": "09fc455c258ec2f7",
+        "type": "change",
+        "z": "919374fb.f2e4d8",
+        "name": "",
+        "rules": [
+            {
+                "t": "move",
+                "p": "payload.cypher",
+                "pt": "msg",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 380,
+        "y": 300,
+        "wires": [
+            [
+                "17abb841858b4fc6"
+            ]
+        ]
+    },
+    {
+        "id": "17abb841858b4fc6",
+        "type": "split",
+        "z": "919374fb.f2e4d8",
+        "name": "",
+        "splt": "\\n",
+        "spltType": "str",
+        "arraySplt": 1,
+        "arraySpltType": "len",
+        "stream": false,
+        "addname": "",
+        "x": 610,
+        "y": 300,
+        "wires": [
+            [
+                "652bfb50bb6829eb"
+            ]
+        ]
+    },
+    {
+        "id": "652bfb50bb6829eb",
+        "type": "change",
+        "z": "919374fb.f2e4d8",
+        "name": "",
+        "rules": [
+            {
+                "t": "move",
+                "p": "payload",
+                "pt": "msg",
+                "to": "query",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 830,
+        "y": 300,
+        "wires": [
+            [
+                "efdd01b0.a21af"
+            ]
+        ]
+    },
+    {
+        "id": "a9f5c2c18c000b22",
+        "type": "debug",
+        "z": "919374fb.f2e4d8",
+        "name": "object output",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
         "complete": "payload",
         "targetType": "msg",
-        "statusVal": "payload",
+        "statusVal": "",
         "statusType": "auto",
-        "x": 700,
-        "y": 280,
+        "x": 340,
+        "y": 380,
         "wires": []
     }
 ]

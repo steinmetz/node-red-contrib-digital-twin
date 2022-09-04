@@ -33,7 +33,7 @@ var Cypher = /** @class */ (function () {
                 for (var _a = 0, _b = asset.properties; _a < _b.length; _a++) {
                     var property = _b[_a];
                     var proAlias = "p".concat(propertyAliasCounter);
-                    cypher.push(" MERGE (".concat(proAlias, ":Property {nodered_id: '").concat(property.id, "'}) \n                                SET ").concat(proAlias, ".name = '").concat(property.name, "',\n                                    ").concat(proAlias, ".a_context = '").concat(property.aContext, "',\n                                    ").concat(proAlias, ".a_id = '").concat(property.aId, "',\n                                    ").concat(proAlias, ".a_type = '").concat(property.aType, "',\n                                    ").concat(proAlias, ".access_group = '").concat(property.accessGroup, "',\n                                    ").concat(proAlias, ".nodered_type = '").concat(property.type, "'"));
+                    cypher.push(this.createPropertyCypher(property, proAlias));
                     cypher.push(" MERGE (".concat(assetAlias, ")-[:").concat(propertyRelationName, "]->(").concat(proAlias, ") "));
                     propertyAliasCounter++;
                 }
@@ -49,6 +49,13 @@ var Cypher = /** @class */ (function () {
             }
         }
         return cypher;
+    };
+    Cypher.prototype.createDataPropertyCypher = function (property) {
+        return "MERGE (p:Property {nodered_id: '".concat(property.id, "'}) \n        SET p.value = '").concat(property.value, "'");
+    };
+    Cypher.prototype.createPropertyCypher = function (property, proAlias) {
+        if (proAlias === void 0) { proAlias = 'p'; }
+        return "MERGE (".concat(proAlias, ":Property {nodered_id: '").concat(property.id, "'}) \n        SET ").concat(proAlias, ".name = '").concat(property.name, "',\n            ").concat(proAlias, ".a_context = '").concat(property.aContext, "',\n            ").concat(proAlias, ".a_id = '").concat(property.aId, "',\n            ").concat(proAlias, ".a_type = '").concat(property.aType, "',\n            ").concat(proAlias, ".access_group = '").concat(property.accessGroup, "',\n            ").concat(proAlias, ".nodered_type = '").concat(property.type, "'");
     };
     Cypher.prototype.createRelationsCypher = function (relations) {
         var cypher = [];

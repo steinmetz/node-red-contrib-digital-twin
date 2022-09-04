@@ -1,4 +1,4 @@
-import { DTAssetNodeDef, DTRelationNodeDef } from "./types";
+import { DTAssetNodeDef, DTPropertyNodeDef, DTRelationNodeDef } from "./types";
 
 export class Cypher {
     convertAssetsRelations(assets: DTAssetNodeDef[], relations: DTRelationNodeDef[]) {
@@ -31,13 +31,7 @@ export class Cypher {
             if (asset.properties) {
                 for (let property of asset.properties) {
                     let proAlias = `p${propertyAliasCounter}`;
-                    cypher.push(` MERGE (${proAlias}:Property {nodered_id: '${property.id}'}) 
-                                SET ${proAlias}.name = '${property.name}',
-                                    ${proAlias}.a_context = '${property.aContext}',
-                                    ${proAlias}.a_id = '${property.aId}',
-                                    ${proAlias}.a_type = '${property.aType}',
-                                    ${proAlias}.access_group = '${property.accessGroup}',
-                                    ${proAlias}.nodered_type = '${property.type}'`);
+                    cypher.push(this.createPropertyCypher(property, proAlias));
                     cypher.push(` MERGE (${assetAlias})-[:${propertyRelationName}]->(${proAlias}) `);
                     propertyAliasCounter++;
                 }
@@ -58,6 +52,21 @@ export class Cypher {
             }
         }
         return cypher;
+    }
+
+    createDataPropertyCypher(property: DTPropertyNodeDef) {
+        return `MERGE (p:Property {nodered_id: '${property.id}'}) 
+        SET p.value = '${property.value}'`;
+    }
+
+    createPropertyCypher(property: DTPropertyNodeDef, proAlias: string = 'p') {
+        return `MERGE (${proAlias}:Property {nodered_id: '${property.id}'}) 
+        SET ${proAlias}.name = '${property.name}',
+            ${proAlias}.a_context = '${property.aContext}',
+            ${proAlias}.a_id = '${property.aId}',
+            ${proAlias}.a_type = '${property.aType}',
+            ${proAlias}.access_group = '${property.accessGroup}',
+            ${proAlias}.nodered_type = '${property.type}'`;
     }
 
     createRelationsCypher(relations: DTRelationNodeDef[]) {

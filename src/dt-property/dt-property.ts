@@ -12,8 +12,7 @@ export = (RED: nodered.NodeAPI): void => {
         this.on('input', (msg: any, send, done): void => {
             node.value = msg.payload;
             let data: DTPropertyNodeMessage = {
-                id: randomUUID(),
-                content: node,
+                payload: node,
             };
             send(data);
         });

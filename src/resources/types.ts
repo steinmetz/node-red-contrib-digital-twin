@@ -40,7 +40,9 @@ export interface DTAssetNodeDef extends DTNodeDef {
 
 export interface DTModelNodeDef extends DTNodeDef { }
 
-export interface DTPropertyNodeDef extends DTNodeDef { }
+export interface DTPropertyNodeDef extends DTNodeDef {
+  value: any;
+ }
 
 export interface DTActionNodeDef extends DTNodeDef { }
 
@@ -76,15 +78,8 @@ export interface DTRelationNode extends DTNode {
 }
 
 
-
-
 // Message types
-interface DTNodeMessage<T> extends nodered.NodeMessage {
-  id: string,
-  content: T,
-}
-
-export interface DTPropertyNodeMessage extends DTNodeMessage<DTPropertyNode> { }
+export interface DTPropertyNodeMessage extends nodered.NodeMessage{ }
 
 export interface GraphMessage extends nodered.NodeMessage {
   cypher?: string[],

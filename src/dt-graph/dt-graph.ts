@@ -3,10 +3,14 @@ import { DT } from '../resources/dt';
 import { DTActionNodeDef, DTAssetNodeDef, DTPropertyNodeDef, DTRelationNodeDef, GraphMessage } from '../resources/types';
 import { Cypher } from '../resources/cypher';
 
+const cypherConverter = new Cypher();
+
+
 var graphNode: nodered.Node;
 
 export = (RED: nodered.NodeAPI): void => {
 
+    // receive updates from the Editor (model changes)
     RED.httpNode.post('/dt-graph', (req, res) => {
 
         if (req.body.action == 'deploy') {
@@ -37,10 +41,12 @@ export = (RED: nodered.NodeAPI): void => {
                 assets.push(asset);
             }
             let relations = Array.from(relationsMap.values());
-            let cypher = toCypher(assets, relations);
+            let cypher = modelToCypher(assets, relations);
             let payload = {
-                'assets': assets,
-                'relations': relations,
+                'model': {
+                    'assets': assets,
+                    'relations': relations,
+                },
                 'cypher': cypher
             };
 
@@ -59,7 +65,21 @@ export = (RED: nodered.NodeAPI): void => {
     });
 
     DT.events.on(DT.eventNames.updateAsset, (msg: any) => {
-        //TODO: update asset in graph
+
+        let property = msg.property as DTPropertyNodeDef;
+        let cypher = propertyToCypher(property);
+        let payload = {
+            'data': {
+                'asset_id': msg.assetId,
+                'property': property
+            },
+            'cypher': cypher
+        };
+
+        let message: GraphMessage = {
+            payload: payload,
+        };
+        graphNode.send(message);
     });
 
 
@@ -107,13 +127,12 @@ function processNode(asset: DTAssetNodeDef, node: any, nodes: any[], relationsMa
 }
 
 
-function toCypher(assets: DTAssetNodeDef[], relations: DTRelationNodeDef[]) {
+function modelToCypher(assets: DTAssetNodeDef[], relations: DTRelationNodeDef[]) {
+    return cypherConverter.convertAssetsRelations(assets, relations);
+}
 
-    let converter = new Cypher();
-
-    let cypher = converter.convertAssetsRelations(assets, relations);    
-
-    return cypher;
+function propertyToCypher(propertyNode: DTPropertyNodeDef) {
+    return [cypherConverter.createDataPropertyCypher(propertyNode)];
 }
 
 
