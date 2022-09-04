@@ -1,6 +1,7 @@
 import * as nodered from "node-red"
 import { DT } from '../resources/dt';
 import { DTActionNodeDef, DTAssetNodeDef, DTPropertyNodeDef, DTRelationNodeDef, GraphMessage } from '../resources/types';
+import { Cypher } from '../resources/cypher';
 
 var graphNode: nodered.Node;
 
@@ -36,7 +37,7 @@ export = (RED: nodered.NodeAPI): void => {
                 assets.push(asset);
             }
             let relations = Array.from(relationsMap.values());
-            let cypher = [''];// toCypher(assets, relations);
+            let cypher = toCypher(assets, relations);
             let payload = {
                 'assets': assets,
                 'relations': relations,
@@ -108,91 +109,11 @@ function processNode(asset: DTAssetNodeDef, node: any, nodes: any[], relationsMa
 
 function toCypher(assets: DTAssetNodeDef[], relations: DTRelationNodeDef[]) {
 
-    let cypher = createAssetsCypher(assets);
-    // cypher += createRelationsCypher(relations);
+    let converter = new Cypher();
+
+    let cypher = converter.convertAssetsRelations(assets, relations);    
 
     return cypher;
 }
 
 
-function createAssetsCypher(assets: DTAssetNodeDef[]) {
-    const propertyRelationName = 'hasProperty';
-    const actionRelationName = 'hasAction';
-    const eventRelationName = 'hasEvent';
-    let cypher: string[] = [];
-
-    let assetAliasCounter = 0;
-    let propertyAliasCounter = 0;
-    let actionAliasCounter = 0;
-
-
-
-
-    for (let asset of assets) {
-        assetAliasCounter++;
-        let assetAlias = `a${assetAliasCounter}`;
-
-        cypher.push(
-            `MERGE (${assetAlias}:Asset {nodered_id: '${asset.id}'}) 
-            SET ${assetAlias}.name = '${asset.name}',
-                ${assetAlias}.nodered_type = '${asset.type}'`);
-
-        // if (asset.properties) {
-        //     for (let property of asset.properties) {
-        //         let proAlias = `p${propertyAliasCounter}`;
-        //         cypher += ` MERGE (${proAlias}:Property {nodered_id: '${property.id}'}) 
-        //                     SET ${proAlias}.name = '${property.name}',
-        //                         ${proAlias}.a_context = '${property.aContext}',
-        //                         ${proAlias}.a_id = '${property.aId}',
-        //                         ${proAlias}.a_type = '${property.aType}',
-        //                         ${proAlias}.access_group = '${property.accessGroup}',
-        //                         ${proAlias}.nodered_type = '${property.type}'`;
-        //         cypher += ` MERGE (${assetAlias})-[:${propertyRelationName}]->(${proAlias}) `;
-        //         propertyAliasCounter++;
-        //     }
-        // }
-        // if (asset.actions) {
-        //     for (let action of asset.actions) {
-        //         let actionAlias = `ac${actionAliasCounter}`;
-        //         cypher += ` MERGE (${actionAlias}:Action {nodered_id: '${action.id}'}) 
-        //                     SET ${actionAlias}.name = '${action.name}',
-        //                         ${actionAlias}.a_context = '${action.aContext}',
-        //                         ${actionAlias}.a_id = '${action.aId}',
-        //                         ${actionAlias}.a_type = '${action.aType}',
-        //                         ${actionAlias}.access_group = '${action.accessGroup}',
-        //                         ${actionAlias}.nodered_type = '${action.type}'`;
-        //         cypher += ` MERGE (${assetAlias})-[:${actionRelationName}]->(${actionAlias}) `;
-        //         actionAliasCounter++;
-        //     }
-        // }
-    }
-    return cypher;
-}
-
-function createRelationsCypher(relations: DTRelationNodeDef[]) {
-    let cypher = '';
-    let originCounter = 0;
-    let targetCounter = 0;
-    let originAlias = `ao${originCounter}`;
-    let targetAlias = `at${targetCounter + 1}`;
-
-    for (let relation of relations) {
-        originCounter++;
-        targetCounter++;
-        let direction = getRelationDirectionCypher(relation.direction, relation.name);
-        for (let origin of relation.origins!) {
-            for (let target of relation.targets!) {
-                cypher += ` MATCH (${originAlias}:Asset {nodered_id: '${origin.id}'}) 
-                            MATCH (${targetAlias}:Asset {nodered_id: '${target.id}'}) 
-                            MERGE (${originAlias})${direction}(${targetAlias})`;
-            }
-        }
-    }
-    return cypher;
-}
-
-function getRelationDirectionCypher(direction: string, name: string): string {
-    if (direction == '-->') return `-[:${name}]->`;
-    if (direction == '<--') return `<-[:${name}]-`;
-    return `<-[:${name}]->`;
-}
