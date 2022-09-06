@@ -1,13 +1,12 @@
 import * as nodered from "node-red"
 import { DT } from '../resources/dt';
-import { DTActionNodeDef, DTAssetNodeDef, DTEventNodeDef, DTNodeDef, DTPropertyNodeDef, DTRelationNodeDef, GraphMessage } from '../resources/types';
+import { DTActionNodeDef, DTAssetNodeDef, DTEventNodeDef, DTNodeDef, DTPropertyNodeDef, DTRelationNode, DTRelationNodeDef, GraphMessage } from '../resources/types';
 import { Cypher } from '../resources/cypher';
 
 const cypherConverter = new Cypher();
 
 
 var graphNode: nodered.Node;
-var deletedNodes : DTNodeDef[] = [];
 
 export = (RED: nodered.NodeAPI): void => {
 
@@ -15,6 +14,9 @@ export = (RED: nodered.NodeAPI): void => {
     RED.httpNode.post('/dt-graph', (req, res) => {
 
         if (req.body.action == 'deploy') {
+
+            let deletedNodes = JSON.parse(req.body.deletedNodes) as DTNodeDef[];
+            console.log('deletedNodes', deletedNodes);
 
             let assets: DTAssetNodeDef[] = [];
             let relationsMap = new Map<string, any>();
@@ -43,7 +45,8 @@ export = (RED: nodered.NodeAPI): void => {
             }
             let relations = Array.from(relationsMap.values());
             let cypher = modelToCypher(assets, relations);
-            cypher.push(...[]);
+            let deletedNodesC = deletedNodesCypher(deletedNodes);
+            cypher.push(...deletedNodesC);
             let payload = {
                 'model': {
                     'assets': assets,
@@ -58,14 +61,17 @@ export = (RED: nodered.NodeAPI): void => {
             };
             graphNode.send(message);
 
+            deletedNodes = [];
+
+
         } else if (req.body.action == 'node_deleted') {
-            deletedNodes.push(req.body.node);
+            // deletedNodes.push(req.body.node);
+
             //TODO: delete node from db 
             //      or keep it in memory for when deploy is called
         } else if (req.body.action == 'node_added') {
 
         }
-        deletedNodes = [];
         res.sendStatus(200);
     });
 
@@ -112,18 +118,27 @@ function processNode(asset: DTAssetNodeDef, node: any, nodes: any[], relationsMa
         case 'dt-model':
             break;
         case 'dt-relation':
-            if (node.type == 'dt-relation') {
-                let outgoingNodes = nodes.find(n => node.wires[0].includes(n.id));
-                let incomingNodes = nodes.find(n => n.wires[0].includes(asset.id));
+            let relationNode = node;
+            console.log('relationNode', relationNode);
+            let outgoingNodes = nodes.filter(n => relationNode.wires[0].includes(n.id)) as DTNodeDef[];
+            let incomingNodes = nodes.filter(n => n.wires[0].includes(relationNode.id)) as DTNodeDef[];
+            console.log('outgoingNodes', outgoingNodes);
+            console.log('incomingNodes', incomingNodes);
+            let isAssetsRelation = !(
+                outgoingNodes.find(e => !e.type.startsWith('dt-asset')) &&
+                incomingNodes.find(e => !e.type.startsWith('dt-asset'))
+            );
+
+            if (isAssetsRelation) {
 
                 relationsMap.set(
                     node.id,
                     {
-                        id: node.id,
-                        name: node.name,
-                        direction: node.direction,
-                        origins: [incomingNodes],
-                        targets: [outgoingNodes]
+                        id: relationNode.id,
+                        name: relationNode.name,
+                        direction: relationNode.direction,
+                        origins: incomingNodes,
+                        targets: outgoingNodes,
                     } as DTRelationNodeDef
                 );
             }

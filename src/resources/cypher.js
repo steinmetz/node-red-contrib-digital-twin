@@ -16,11 +16,23 @@ var Cypher = /** @class */ (function () {
     Cypher.prototype.convertAssetsRelations = function (assets, relations) {
         return __spreadArray(__spreadArray([], this.createAssetsCypher(assets), true), this.createRelationsCypher(relations), true);
     };
+    // TODO: just set the node as deleted and not delete it
     Cypher.prototype.deletedNodesCypher = function (nodes) {
         var cypher = [];
         for (var _i = 0, nodes_1 = nodes; _i < nodes_1.length; _i++) {
             var node = nodes_1[_i];
-            cypher.push("MATCH (n:".concat(node.label, " {id: \"").concat(node.id, "\"}) DETACH DELETE n"));
+            if (node.type == 'dt-asset') {
+                cypher.push("MATCH (n:Asset {nodered_id: \"".concat(node.id, "\"}) DETACH DELETE n"));
+            }
+            else if (node.type == 'dt-property') {
+                cypher.push("MATCH (n:Property {nodered_id: \"".concat(node.id, "\"}) DETACH DELETE n"));
+            }
+            else if (node.type == 'dt-action') {
+                cypher.push("MATCH (n:Action {nodered_id: \"".concat(node.id, "\"}) DETACH DELETE n"));
+            }
+            else if (node.type == 'dt-event') {
+                cypher.push("MATCH (n:Event {nodered_id: \"".concat(node.id, "\"}) DETACH DELETE n"));
+            }
         }
         return cypher;
     };

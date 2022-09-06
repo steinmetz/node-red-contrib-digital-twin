@@ -3,7 +3,6 @@ var dt_1 = require("../resources/dt");
 var cypher_1 = require("../resources/cypher");
 var cypherConverter = new cypher_1.Cypher();
 var graphNode;
-var deletedNodes = [];
 function processNode(asset, node, nodes, relationsMap) {
     switch (node.type) {
         case 'dt-property':
@@ -24,15 +23,21 @@ function processNode(asset, node, nodes, relationsMap) {
         case 'dt-model':
             break;
         case 'dt-relation':
-            if (node.type == 'dt-relation') {
-                var outgoingNodes = nodes.find(function (n) { return node.wires[0].includes(n.id); });
-                var incomingNodes = nodes.find(function (n) { return n.wires[0].includes(asset.id); });
+            var relationNode_1 = node;
+            console.log('relationNode', relationNode_1);
+            var outgoingNodes = nodes.filter(function (n) { return relationNode_1.wires[0].includes(n.id); });
+            var incomingNodes = nodes.filter(function (n) { return n.wires[0].includes(relationNode_1.id); });
+            console.log('outgoingNodes', outgoingNodes);
+            console.log('incomingNodes', incomingNodes);
+            var isAssetsRelation = !(outgoingNodes.find(function (e) { return !e.type.startsWith('dt-asset'); }) &&
+                incomingNodes.find(function (e) { return !e.type.startsWith('dt-asset'); }));
+            if (isAssetsRelation) {
                 relationsMap.set(node.id, {
-                    id: node.id,
-                    name: node.name,
-                    direction: node.direction,
-                    origins: [incomingNodes],
-                    targets: [outgoingNodes]
+                    id: relationNode_1.id,
+                    name: relationNode_1.name,
+                    direction: relationNode_1.direction,
+                    origins: incomingNodes,
+                    targets: outgoingNodes,
                 });
             }
             break;
@@ -53,6 +58,8 @@ module.exports = function (RED) {
     // receive updates from the Editor (model changes)
     RED.httpNode.post('/dt-graph', function (req, res) {
         if (req.body.action == 'deploy') {
+            var deletedNodes = JSON.parse(req.body.deletedNodes);
+            console.log('deletedNodes', deletedNodes);
             var assets = [];
             var relationsMap = new Map();
             var nodes = JSON.parse(req.body.nodes);
@@ -80,7 +87,8 @@ module.exports = function (RED) {
             }
             var relations = Array.from(relationsMap.values());
             var cypher = modelToCypher(assets, relations);
-            cypher.push.apply(cypher, []);
+            var deletedNodesC = deletedNodesCypher(deletedNodes);
+            cypher.push.apply(cypher, deletedNodesC);
             var payload = {
                 'model': {
                     'assets': assets,
@@ -93,15 +101,15 @@ module.exports = function (RED) {
                 payload: payload,
             };
             graphNode.send(message);
+            deletedNodes = [];
         }
         else if (req.body.action == 'node_deleted') {
-            deletedNodes.push(req.body.node);
+            // deletedNodes.push(req.body.node);
             //TODO: delete node from db 
             //      or keep it in memory for when deploy is called
         }
         else if (req.body.action == 'node_added') {
         }
-        deletedNodes = [];
         res.sendStatus(200);
     });
     dt_1.DT.events.on(dt_1.DT.eventNames.updateAsset, function (msg) {
