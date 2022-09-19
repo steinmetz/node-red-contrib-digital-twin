@@ -6,13 +6,16 @@ export = (RED: nodered.NodeAPI): void => {
     function DTAsset(this: DTAssetNode, config: DTAssetNodeDef): void {        
         RED.nodes.createNode(this, config);
         this.on('input', (msg: any, send, done): void => {
-            DT.events.emit(
-                DT.eventNames.updateAsset,
-                {
-                    property: msg.payload,
-                    assetId: this.id,
-                }
-            );
+            console.log('DTAsset input');
+            console.log(msg);
+            console.log(this);
+            // DT.events.emit(
+            //     DT.eventNames.updateAsset,
+            //     {
+            //         property: msg.payload,
+            //         assetId: this.id,
+            //     }
+            // );
         });
     };
     RED.nodes.registerType('dt-asset', DTAsset);
