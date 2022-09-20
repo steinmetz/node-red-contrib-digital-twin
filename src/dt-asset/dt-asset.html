@@ -21,7 +21,10 @@
         let hasGraph =
             allNodes.filter((node) => node.type.startsWith("dt-graph")) > 0;
         if (!hasGraph) {
-            throw("No dt-graph node found. Please add a dt-graph node to your model.");
+            RED.notify(
+                "No dt-graph node found. Please add a dt-graph node to your model.",
+                "error"
+            );
         }
     });
 </script>
