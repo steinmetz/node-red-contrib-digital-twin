@@ -10,6 +10,7 @@ var DT;
         events.on = _myEmitter.on.bind(_myEmitter);
         events.emit = _myEmitter.emit.bind(_myEmitter);
         events.listenerCount = _myEmitter.listenerCount.bind(_myEmitter);
+        events.listeners = _myEmitter.listeners.bind(_myEmitter);
     })(events = DT.events || (DT.events = {}));
     var eventNames;
     (function (eventNames) {

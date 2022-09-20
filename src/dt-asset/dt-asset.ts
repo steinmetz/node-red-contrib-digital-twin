@@ -11,7 +11,11 @@ export = (RED: nodered.NodeAPI): void => {
                     property: msg.payload,
                     assetId: this.id,
                 };
-                if (RED.events.listenerCount(DT.eventNames.updateAsset) > 0) {
+                let listeners = DT.events.listeners(DT.eventNames.updateAsset);
+                console.log('listeners', listeners);
+                let count = DT.events.listenerCount(DT.eventNames.updateAsset);
+                console.log('count', count);
+                if (listeners.length > 0) {
                     DT.events.emit(DT.eventNames.updateAsset, data);
                 }
             });
