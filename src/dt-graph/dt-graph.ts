@@ -16,8 +16,6 @@ export = (RED: nodered.NodeAPI): void => {
         if (req.body.action == 'deploy') {
 
             let deletedNodes = JSON.parse(req.body.deletedNodes) as DTNodeDef[];
-            console.log('deletedNodes', deletedNodes);
-
             let assets: DTAssetNodeDef[] = [];
             let relationsMap = new Map<string, any>();
 

@@ -59,7 +59,6 @@ module.exports = function (RED) {
     RED.httpNode.post('/dt-graph', function (req, res) {
         if (req.body.action == 'deploy') {
             var deletedNodes = JSON.parse(req.body.deletedNodes);
-            console.log('deletedNodes', deletedNodes);
             var assets = [];
             var relationsMap = new Map();
             var nodes = JSON.parse(req.body.nodes);

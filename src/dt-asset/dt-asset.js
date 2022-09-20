@@ -10,13 +10,7 @@ module.exports = function (RED) {
                     property: msg.payload,
                     assetId: _this.id,
                 };
-                var listeners = dt_1.DT.events.listeners(dt_1.DT.eventNames.updateAsset);
-                console.log('listeners', listeners);
-                var count = dt_1.DT.events.listenerCount(dt_1.DT.eventNames.updateAsset);
-                console.log('count', count);
-                if (listeners.length > 0) {
-                    dt_1.DT.events.emit(dt_1.DT.eventNames.updateAsset, data);
-                }
+                dt_1.DT.events.emit(dt_1.DT.eventNames.updateAsset, data);
             });
         });
     }
