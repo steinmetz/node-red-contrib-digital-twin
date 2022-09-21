@@ -1,6 +1,6 @@
 {
     "name": "@digitaltwins/node-red-contrib-digital-twin",
-    "version": "0.1.1",
+    "version": "0.1.2",
     "description": "Nodes for modeling Digital Twins",
     "directories": {
         "example": "examples"
