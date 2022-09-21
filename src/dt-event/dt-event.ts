@@ -4,16 +4,24 @@ interface DTEventNodeDef extends nodered.NodeDef {
     bound_to: string
 }
 
-function handleDeploy(nodes: any){
+function handleDeploy(nodes: any) {
     console.log('deploy');
- }
+}
 
 export = (RED: nodered.NodeAPI): void => {
+
+
     function DTEvent(this: nodered.Node, config: DTEventNodeDef): void {
         RED.nodes.createNode(this, config);
 
-        RED.events.on('deploy', handleDeploy);
- 
+        RED.events.on("deploy", function (nodes) {
+            return console.log("deploy");
+        });
+
+        RED.events.on("nodes:remove", function (node) {
+            console.log("node removed");
+        });
+
         this.on('close', (removed: boolean, done: any) => {
             RED.events.off("deploy", handleDeploy);
             done();

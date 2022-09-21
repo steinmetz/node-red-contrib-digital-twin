@@ -94,10 +94,13 @@ export = (RED: nodered.NodeAPI): void => {
 
     function DTGraph(this: nodered.Node, config: DTActionNodeDef): void {
         RED.nodes.createNode(this, config);
-        graphNode = this;
+        graphNode = this; 
     };
     RED.nodes.registerType('dt-graph', DTGraph);
 };
+
+
+
 
 function processNode(asset: DTAssetNodeDef, node: any, nodes: any[], relationsMap: Map<string, any>) {
     switch (node.type) {

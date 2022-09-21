@@ -14,24 +14,32 @@
         label: function () {
             return this.name || "dt-graph";
         },
-    });
+        onpaletteadd: function () {            
+            RED.events.on("deploy", function (msg) {
+                let allNodes = RED.nodes.createCompleteNodeSet();
+                let allDTNodes = allNodes.filter((node) =>
+                    node.type.startsWith("dt-")
+                );
+               
+                //checks if model has dt nodes
+                // TODO: https://discourse.nodered.org/t/listen-to-events-only-when-node-is-in-use/67970/3
+                if(allDTNodes.length == 0) return;                
 
-    RED.events.on("deploy", function (msg) {
-        let allNodes = RED.nodes.createCompleteNodeSet();
-        let allDTNodes = allNodes.filter((node) => node.type.startsWith("dt-"));
-        let nodes = JSON.stringify(allDTNodes);
-        let deletedNodesJSON = JSON.stringify(deletedNodes);
+                let nodes = JSON.stringify(allDTNodes);
+                let deletedNodesJSON = JSON.stringify(deletedNodes);
 
-        $.post("/dt-graph", {
-            nodes: nodes,
-            deletedNodes: deletedNodesJSON,
-            action: "deploy",
-        });
-        deletedNodes = [];
-    });
+                $.post("/dt-graph", {
+                    nodes: nodes,
+                    deletedNodes: deletedNodesJSON,
+                    action: "deploy",
+                });
+                deletedNodes = [];
+            });
 
-    RED.events.on("nodes:remove", function (node) {
-        deletedNodes.push(node);
+            RED.events.on("nodes:remove", function (node) {
+                deletedNodes.push(node);
+            });
+        },
     });
 </script>
 

@@ -15,17 +15,23 @@
         label: function () {
             return this.name || "dt-asset";
         },
-    });
-    RED.events.on("deploy", function (msg) {
-        let allNodes = RED.nodes.createCompleteNodeSet();
-        let hasGraph =
-            allNodes.filter((node) => node.type.startsWith("dt-graph")) > 0;
-        if (!hasGraph) {
-            RED.notify(
-                "No dt-graph node found. Please add a dt-graph node to your model.",
-                "error"
-            );
-        }
+        onpaletteadd: function () {
+            RED.events.on("deploy", function (msg) {
+                let allNodes = RED.nodes.createCompleteNodeSet();
+                
+                //checks if model has dt nodes
+                if (!allNodes.some((node) => node.type.startsWith("dt-")))
+                    return;
+
+                //if there are dt nodes, then check if graph node exists
+                if (!allNodes.some((node) => node.type.startsWith("dt-graph"))){
+                    RED.notify(
+                        "No dt-graph node found. Please add a dt-graph node to your model.",
+                        "error"
+                    );
+                }
+            });
+        },
     });
 </script>
 
