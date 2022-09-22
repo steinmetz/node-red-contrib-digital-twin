@@ -1,0 +1,9 @@
+<dt-asset> ::=  <dt-model>      | 
+                <dt-event>      | 
+                <dt-action>     | 
+                <dt-property>   | 
+                <dt-relation> ::=   <dt-asset>    |
+                                    <dt-event>    |
+                                    <dt-action>   |
+                                    <dt-property> |
+                                    <dt-model> ::= <dt-event>;
