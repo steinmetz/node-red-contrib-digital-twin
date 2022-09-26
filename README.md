@@ -1,4 +1,6 @@
-# NodeRED Digital Twins
+[![Platform Node-RED](http://b.repl.ca/v1/Platform-Node--RED-red.png)](https://flows.nodered.org/node/@digitaltwins/node-red-contrib-digital-twin)
+
+# NodeRED nodes for modeling Digital Twins
 
 A set of NodeRED nodes for modeling Digital Twins with semantics.
 
