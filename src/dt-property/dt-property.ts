@@ -8,6 +8,7 @@ export = (RED: nodered.NodeAPI): void => {
         this.accessGroup = config.accessGroup;
         this.aContext = config.aContext;
         this.aId = config.aId;
+        this.aType = config.aType;
         var node = this;
         this.on('input', (msg: any, send, done): void => {
             node.value = msg.payload;

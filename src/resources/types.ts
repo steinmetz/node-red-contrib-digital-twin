@@ -14,7 +14,8 @@ import * as nodered from "node-red"
   *        Should be serialized with '@' prefix
   *       https://www.w3.org/TR/json-ld11/#node-identifier-indexing
   * 
-  * @aType defined for not conflicting with nodered 'type'.
+  * @aType defined for not conflicting with nodered 'type'. 
+  *         This defines the type class of the node (schema.org, ...)
   * 
   */
 export interface DTNodeDef extends nodered.NodeDef {
@@ -69,6 +70,7 @@ export interface DTNode extends nodered.Node {
   aContext: string;
   aId: string;
   aDTType: string[];
+  aType: string[];
   accessGroup: string;
 }
 export interface DTAssetNode extends DTNode {
