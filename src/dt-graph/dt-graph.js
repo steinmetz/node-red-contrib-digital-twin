@@ -2,7 +2,22 @@
 var dt_1 = require("../resources/dt");
 var cypher_1 = require("../resources/cypher");
 var cypherConverter = new cypher_1.Cypher();
+var projectId = 'project1';
 var graphNode;
+function setupActions(assets, RED) {
+    // for (let asset of assets) {
+    //     client.on('steinmetz/' + asset.name, function (topic: any, message: any) {
+    //         // message is Buffer
+    //         console.log(message.toString())
+    //         // client.end()
+    //     })
+    // }
+    // client.on('steinmetz', function (topic: any, message: any) {
+    //     // message is Buffer
+    //     console.log(message.toString())
+    //     // client.end()
+    // })
+}
 function processNode(asset, node, nodes, relationsMap) {
     switch (node.type) {
         case 'dt-property':
@@ -24,11 +39,8 @@ function processNode(asset, node, nodes, relationsMap) {
             break;
         case 'dt-relation':
             var relationNode_1 = node;
-            console.log('relationNode', relationNode_1);
             var outgoingNodes = nodes.filter(function (n) { return relationNode_1.wires[0].includes(n.id); });
             var incomingNodes = nodes.filter(function (n) { return n.wires[0].includes(relationNode_1.id); });
-            console.log('outgoingNodes', outgoingNodes);
-            console.log('incomingNodes', incomingNodes);
             var isAssetsRelation = !(outgoingNodes.find(function (e) { return !e.type.startsWith('dt-asset'); }) &&
                 incomingNodes.find(function (e) { return !e.type.startsWith('dt-asset'); }));
             if (isAssetsRelation) {
@@ -84,6 +96,7 @@ module.exports = function (RED) {
                 var assetNode = assetsNodes_1[_i];
                 _loop_1(assetNode);
             }
+            setupActions(assets, RED);
             var relations = Array.from(relationsMap.values());
             var cypher = modelToCypher(assets, relations);
             var deletedNodesC = deletedNodesCypher(deletedNodes);

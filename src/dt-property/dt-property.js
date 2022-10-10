@@ -5,6 +5,7 @@ module.exports = function (RED) {
         this.accessGroup = config.accessGroup;
         this.aContext = config.aContext;
         this.aId = config.aId;
+        this.aType = config.aType;
         var node = this;
         this.on('input', function (msg, send, done) {
             node.value = msg.payload;

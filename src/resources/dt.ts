@@ -10,5 +10,6 @@ export namespace DT {
     }
     export namespace eventNames {
         export const updateAsset = 'updateAsset';
+        export const actionCall = 'actionCall';
     }
 }

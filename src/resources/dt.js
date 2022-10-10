@@ -15,5 +15,6 @@ var DT;
     var eventNames;
     (function (eventNames) {
         eventNames.updateAsset = 'updateAsset';
+        eventNames.actionCall = 'actionCall';
     })(eventNames = DT.eventNames || (DT.eventNames = {}));
 })(DT = exports.DT || (exports.DT = {}));

@@ -5,13 +5,11 @@ module.exports = function (RED) {
         var _this = this;
         RED.nodes.createNode(this, config);
         this.on('input', function (msg, send, done) {
-            _this.on('input', function (msg, send, done) {
-                var data = {
-                    property: msg.payload,
-                    assetId: _this.id,
-                };
-                dt_1.DT.events.emit(dt_1.DT.eventNames.updateAsset, data);
-            });
+            var data = {
+                property: msg.payload,
+                assetId: _this.id,
+            };
+            dt_1.DT.events.emit(dt_1.DT.eventNames.updateAsset, data);
         });
     }
     ;
