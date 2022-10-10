@@ -5,6 +5,7 @@ import { Cypher } from '../resources/cypher';
 
 const cypherConverter = new Cypher();
 
+const projectId = 'project1';
 
 var graphNode: nodered.Node;
 
@@ -41,6 +42,9 @@ export = (RED: nodered.NodeAPI): void => {
                 }
                 assets.push(asset);
             }
+
+            setupActions(assets, RED);
+
             let relations = Array.from(relationsMap.values());
             let cypher = modelToCypher(assets, relations);
             let deletedNodesC = deletedNodesCypher(deletedNodes);
@@ -94,12 +98,27 @@ export = (RED: nodered.NodeAPI): void => {
 
     function DTGraph(this: nodered.Node, config: DTActionNodeDef): void {
         RED.nodes.createNode(this, config);
-        graphNode = this; 
+        graphNode = this;
     };
     RED.nodes.registerType('dt-graph', DTGraph);
 };
 
 
+function setupActions(assets: DTAssetNodeDef[], RED: nodered.NodeAPI) {
+    // for (let asset of assets) {
+
+    //     client.on('steinmetz/' + asset.name, function (topic: any, message: any) {
+    //         // message is Buffer
+    //         console.log(message.toString())
+    //         // client.end()
+    //     })
+    // }
+    // client.on('steinmetz', function (topic: any, message: any) {
+    //     // message is Buffer
+    //     console.log(message.toString())
+    //     // client.end()
+    // })
+}
 
 
 function processNode(asset: DTAssetNodeDef, node: any, nodes: any[], relationsMap: Map<string, any>) {
@@ -120,18 +139,15 @@ function processNode(asset: DTAssetNodeDef, node: any, nodes: any[], relationsMa
             break;
         case 'dt-relation':
             let relationNode = node;
-            console.log('relationNode', relationNode);
             let outgoingNodes = nodes.filter(n => relationNode.wires[0].includes(n.id)) as DTNodeDef[];
             let incomingNodes = nodes.filter(n => n.wires[0].includes(relationNode.id)) as DTNodeDef[];
-            console.log('outgoingNodes', outgoingNodes);
-            console.log('incomingNodes', incomingNodes);
+
             let isAssetsRelation = !(
                 outgoingNodes.find(e => !e.type.startsWith('dt-asset')) &&
                 incomingNodes.find(e => !e.type.startsWith('dt-asset'))
             );
 
             if (isAssetsRelation) {
-
                 relationsMap.set(
                     node.id,
                     {
