@@ -4,6 +4,19 @@
 
 A set of NodeRED nodes for modeling Digital Twins with semantics.
 
+More information can be found here: [A methodology for creating semantic digital twin models supported by knowledge graphs](https://ieeexplore.ieee.org/document/9921499)
+
+```
+@INPROCEEDINGS{steinmetz2022,  
+author={Steinmetz, Charles and Schroeder, Greyce N. and Sulak, Adam and Tuna, Kaan and Binotto, Alecio and Rettberg, Achim and Pereira, Carlos Eduardo},  booktitle={2022 IEEE 27th International Conference on Emerging Technologies and Factory Automation (ETFA)},   
+title={A methodology for creating semantic digital twin models supported by knowledge graphs},   
+year={2022},
+pages={1-7},  
+doi={10.1109/ETFA52439.2022.9921499}
+}
+```
+
+
 # Simple example
 <img width="600" alt="nodes (1)" src="https://user-images.githubusercontent.com/3587083/188316228-9d59f0d5-caf5-4d2f-ac2a-54978500c380.png"> 
 
@@ -11,6 +24,9 @@ A set of NodeRED nodes for modeling Digital Twins with semantics.
 
 # Nodes
 <img width="568" alt="nodes (1)" src="https://user-images.githubusercontent.com/3587083/186910297-93557df9-84fe-4acc-8540-dfb9214688f8.png">
+
+
+
 
 
 
