@@ -2,7 +2,6 @@
 var dt_1 = require("../resources/dt");
 var cypher_1 = require("../resources/cypher");
 var cypherConverter = new cypher_1.Cypher();
-var projectId = 'project1';
 var graphNode;
 function setupActions(assets, RED) {
     // for (let asset of assets) {
@@ -103,6 +102,9 @@ module.exports = function (RED) {
             cypher.push.apply(cypher, deletedNodesC);
             var payload = {
                 'model': {
+                    'projectName': graphNode.projectName,
+                    'projectId': graphNode.projectId,
+                    'version': graphNode.version,
                     'assets': assets,
                     'relations': relations,
                     'deletedNodes': deletedNodes
@@ -142,6 +144,9 @@ module.exports = function (RED) {
     function DTGraph(config) {
         RED.nodes.createNode(this, config);
         graphNode = this;
+        graphNode.projectName = config.projectName;
+        graphNode.projectId = config.projectId;
+        graphNode.version = config.version;
     }
     ;
     RED.nodes.registerType('dt-graph', DTGraph);

@@ -1,13 +1,11 @@
 import * as nodered from "node-red"
 import { DT } from '../resources/dt';
-import { DTActionNodeDef, DTAssetNodeDef, DTEventNodeDef, DTNodeDef, DTPropertyNodeDef, DTRelationNode, DTRelationNodeDef, GraphMessage } from '../resources/types';
+import { DTActionNodeDef, DTAssetNodeDef, DTEventNodeDef, DTGraphNode, DTGraphNodeDef, DTNodeDef, DTPropertyNodeDef, DTRelationNode, DTRelationNodeDef, GraphMessage } from '../resources/types';
 import { Cypher } from '../resources/cypher';
 
 const cypherConverter = new Cypher();
 
-const projectId = 'project1';
-
-var graphNode: nodered.Node;
+var graphNode: DTGraphNode;
 
 export = (RED: nodered.NodeAPI): void => {
 
@@ -51,6 +49,9 @@ export = (RED: nodered.NodeAPI): void => {
             cypher.push(...deletedNodesC);
             let payload = {
                 'model': {
+                    'projectName': graphNode.projectName,
+                    'projectId': graphNode.projectId,
+                    'version': graphNode.version,
                     'assets': assets,
                     'relations': relations,
                     'deletedNodes': deletedNodes
@@ -96,9 +97,12 @@ export = (RED: nodered.NodeAPI): void => {
     });
 
 
-    function DTGraph(this: nodered.Node, config: DTActionNodeDef): void {
+    function DTGraph(this: DTGraphNode, config: DTGraphNodeDef): void {
         RED.nodes.createNode(this, config);
-        graphNode = this;
+        graphNode = this as DTGraphNode;
+        graphNode.projectName = config.projectName;
+        graphNode.projectId = config.projectId;
+        graphNode.version = config.version;
     };
     RED.nodes.registerType('dt-graph', DTGraph);
 };

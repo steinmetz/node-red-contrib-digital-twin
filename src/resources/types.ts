@@ -53,6 +53,12 @@ export interface DTActionNodeDef extends DTNodeDef {
 export interface DTEventNodeDef extends DTNodeDef {
 }
 
+export interface DTGraphNodeDef extends nodered.NodeDef {
+  projectName: string;
+  projectId: string;
+  version: string;
+}
+
 export interface DTRelationNodeDef extends DTNodeDef {
   direction: string, //-->, <--, <-->
   origins?: DTNodeDef[],
@@ -73,6 +79,19 @@ export interface DTNode extends nodered.Node {
   aDTType: string[];
   aType: string[];
   accessGroup: string;
+}
+
+/**
+ * 
+ * @projectName name of the project
+ * @projectId uuid of the project
+ * @versionCode 1, 2, 3, ...
+ * @versionLabel 1.0.0, 1.0.1, ...
+ */
+export interface DTGraphNode extends nodered.Node {
+  projectName: string; 
+  projectId: string;
+  version: string;
 }
 export interface DTAssetNode extends DTNode {
 }
