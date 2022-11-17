@@ -6,8 +6,8 @@
         inputs: 1,
         outputs: 1,
         defaults: {
-            bound_to: { value: "" },
-            name: { value: "" }
+            name: { value: "" },
+            topic: { value: "" },
         },
         icon: 'hash.svg',
         label: function () {
@@ -21,7 +21,11 @@
         <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
         <input type="text" id="node-input-name" placeholder="Name">
     </div>
-    <div class="form-tips"><b>Tip:</b> This is here to help.</div>
+    <div class="form-row">
+        <label for="node-input-topic"><i class="fa fa-tag"></i> Topic</label>
+        <input type="text" id="node-input-topic" placeholder="topic">
+    </div>
+    <div class="form-tips"><b>Tip:</b> Topic used to listen to the event.</div>
 </script>
 
 <script type="text/html" data-help-name="dt-event">

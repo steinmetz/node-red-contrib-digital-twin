@@ -52,6 +52,7 @@ export interface DTActionNodeDef extends DTNodeDef {
 }
 
 export interface DTEventNodeDef extends DTNodeDef {
+  topic: string;
 }
 
 export interface DTGraphNodeDef extends nodered.NodeDef {
@@ -108,6 +109,9 @@ export interface DTRelationNode extends DTNode {
 export interface DTActionNode extends DTNode {
   topic: string;
   payload: string;
+}
+export interface DTEventNode extends DTNode {
+  topic: string; 
 }
 
 

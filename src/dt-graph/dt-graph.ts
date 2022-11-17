@@ -24,7 +24,6 @@ export = (RED: nodered.NodeAPI): void => {
                 throw new Error('No assets found');
             }
 
-
             for (let assetNode of assetsNodes) {
 
                 let asset = assetNode as DTAssetNodeDef;
@@ -40,8 +39,6 @@ export = (RED: nodered.NodeAPI): void => {
                 }
                 assets.push(asset);
             }
-
-            setupActions(assets, RED);
 
             let relations = Array.from(relationsMap.values());
             let cypher = modelToCypher(assets, relations);
@@ -107,24 +104,6 @@ export = (RED: nodered.NodeAPI): void => {
     RED.nodes.registerType('dt-graph', DTGraph);
 };
 
-
-function setupActions(assets: DTAssetNodeDef[], RED: nodered.NodeAPI) {
-    // for (let asset of assets) {
-
-    //     client.on('steinmetz/' + asset.name, function (topic: any, message: any) {
-    //         // message is Buffer
-    //         console.log(message.toString())
-    //         // client.end()
-    //     })
-    // }
-    // client.on('steinmetz', function (topic: any, message: any) {
-    //     // message is Buffer
-    //     console.log(message.toString())
-    //     // client.end()
-    // })
-}
-
-
 function processNode(asset: DTAssetNodeDef, node: any, nodes: any[], relationsMap: Map<string, any>) {
     switch (node.type) {
         case 'dt-property':
@@ -136,7 +115,7 @@ function processNode(asset: DTAssetNodeDef, node: any, nodes: any[], relationsMa
             asset.actions.push(node as DTActionNodeDef);
             break;
         case 'dt-event':
-            if (!asset.events) asset.actions = [];
+            if (!asset.events) asset.events = [];
             asset.events.push(node as DTEventNodeDef);
             break;
         case 'dt-model':

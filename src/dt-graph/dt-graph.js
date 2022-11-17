@@ -3,20 +3,6 @@ var dt_1 = require("../resources/dt");
 var cypher_1 = require("../resources/cypher");
 var cypherConverter = new cypher_1.Cypher();
 var graphNode;
-function setupActions(assets, RED) {
-    // for (let asset of assets) {
-    //     client.on('steinmetz/' + asset.name, function (topic: any, message: any) {
-    //         // message is Buffer
-    //         console.log(message.toString())
-    //         // client.end()
-    //     })
-    // }
-    // client.on('steinmetz', function (topic: any, message: any) {
-    //     // message is Buffer
-    //     console.log(message.toString())
-    //     // client.end()
-    // })
-}
 function processNode(asset, node, nodes, relationsMap) {
     switch (node.type) {
         case 'dt-property':
@@ -31,7 +17,7 @@ function processNode(asset, node, nodes, relationsMap) {
             break;
         case 'dt-event':
             if (!asset.events)
-                asset.actions = [];
+                asset.events = [];
             asset.events.push(node);
             break;
         case 'dt-model':
@@ -95,7 +81,6 @@ module.exports = function (RED) {
                 var assetNode = assetsNodes_1[_i];
                 _loop_1(assetNode);
             }
-            setupActions(assets, RED);
             var relations = Array.from(relationsMap.values());
             var cypher = modelToCypher(assets, relations);
             var deletedNodesC = deletedNodesCypher(deletedNodes);
