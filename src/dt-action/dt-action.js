@@ -3,7 +3,8 @@ var dt_1 = require("../resources/dt");
 module.exports = function (RED) {
     function DTAction(config) {
         RED.nodes.createNode(this, config);
-        this.call = config.call;
+        this.topic = config.topic;
+        this.payload = config.payload;
     }
     ;
     dt_1.DT.events.on(dt_1.DT.eventNames.actionCall, function (msg) {

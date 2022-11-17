@@ -47,7 +47,8 @@ export interface DTPropertyNodeDef extends DTNodeDef {
 }
 
 export interface DTActionNodeDef extends DTNodeDef {
-  call: DTActionCall;
+  topic: string;
+  payload: string;
 }
 
 export interface DTEventNodeDef extends DTNodeDef {
@@ -105,7 +106,8 @@ export interface DTRelationNode extends DTNode {
 }
 
 export interface DTActionNode extends DTNode {
-  call: DTActionCall;
+  topic: string;
+  payload: string;
 }
 
 
@@ -114,14 +116,4 @@ export interface DTPropertyNodeMessage extends nodered.NodeMessage { }
 
 export interface GraphMessage extends nodered.NodeMessage {
   cypher?: string[],
-}
-
-// general types
-export interface DTActionCall{
-  mqtt: DTActionCallMqtt;
-}
-
-interface DTActionCallMqtt{
-  topic: string;
-  payload: string;
 }

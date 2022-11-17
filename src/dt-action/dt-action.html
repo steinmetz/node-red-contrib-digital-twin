@@ -5,8 +5,9 @@
         color: '#FFCC66',
         defaults: {
             params: { value: {} },
-            name: { value: "" }
-            
+            name: { value: "" },
+            topic: { value: "" },
+            payload: { value: "" },
         },
         inputs: 1,
         outputs: 1,
@@ -22,11 +23,19 @@
         <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
         <input type="text" id="node-input-name" placeholder="Name">
     </div>
+    <div class="form-row">
+        <label for="node-input-topic"><i class="fa fa-tag"></i> Topic</label>
+        <input type="text" id="node-input-topic" placeholder="Topic">
+    </div>
+    <div class="form-row">
+        <label for="node-input-payload"><i class="fa fa-tag"></i> Payload</label>
+        <input type="text" id="node-input-payload" placeholder="{'param1': value1}">
+    </div>
     <div class="form-tips"><b>Tip:</b> This is here to help.</div>
 </script>
 
 <script type="text/html" data-help-name="dt-action">
-   <p>Some useful help text to introduce the node.</p>
+   <p>Actions can be called via MQTT topics passing params in the payload</p>
    <h3>Outputs</h3>
        <dl class="message-properties">
        <dt>payload
