@@ -42,8 +42,17 @@ export interface DTAssetNodeDef extends DTNodeDef {
 export interface DTModelNodeDef extends DTNodeDef {
 }
 
+/**
+  * Defines node properties based on Json-ld standard
+  *
+  * @readFrequency defines the frequency of the read operation
+  * @readFrequencyUnit defines the unit of the read frequency (ms, s, m, h, d)
+  * 
+  */
 export interface DTPropertyNodeDef extends DTNodeDef {
   value: any;
+  readFrequency: number;
+  readFrequencyUnit: string;
 }
 
 export interface DTActionNodeDef extends DTNodeDef {

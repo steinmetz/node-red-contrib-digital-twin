@@ -55,6 +55,7 @@ module.exports = function (RED) {
     // receive updates from the Editor (model changes)
     RED.httpNode.post('/dt-graph', function (req, res) {
         if (req.body.action == 'deploy') {
+            console.time('deploy');
             var deletedNodes = JSON.parse(req.body.deletedNodes);
             var assets = [];
             var relationsMap = new Map();
@@ -99,8 +100,9 @@ module.exports = function (RED) {
             var message = {
                 payload: payload,
             };
-            graphNode.send(message);
+            graphNode.send([message, null]);
             deletedNodes = [];
+            console.timeEnd('deploy');
         }
         else if (req.body.action == 'node_deleted') {
             // deletedNodes.push(req.body.node);
@@ -124,7 +126,7 @@ module.exports = function (RED) {
         var message = {
             payload: payload,
         };
-        graphNode.send(message);
+        graphNode.send([null, message]);
     });
     function DTGraph(config) {
         RED.nodes.createNode(this, config);

@@ -2,6 +2,7 @@ import * as nodered from "node-red"
 import { DT } from '../resources/dt';
 import { DTActionNodeDef, DTAssetNodeDef, DTEventNodeDef, DTGraphNode, DTGraphNodeDef, DTNodeDef, DTPropertyNodeDef, DTRelationNode, DTRelationNodeDef, GraphMessage } from '../resources/types';
 import { Cypher } from '../resources/cypher';
+import { env } from "process";
 
 const cypherConverter = new Cypher();
 
@@ -13,6 +14,8 @@ export = (RED: nodered.NodeAPI): void => {
     RED.httpNode.post('/dt-graph', (req, res) => {
 
         if (req.body.action == 'deploy') {
+
+            console.time('deploy');
 
             let deletedNodes = JSON.parse(req.body.deletedNodes) as DTNodeDef[];
             let assets: DTAssetNodeDef[] = [];
@@ -59,9 +62,10 @@ export = (RED: nodered.NodeAPI): void => {
             let message: GraphMessage = {
                 payload: payload,
             };
-            graphNode.send(message);
+            graphNode.send([message, null]);
 
             deletedNodes = [];
+            console.timeEnd('deploy');
 
 
         } else if (req.body.action == 'node_deleted') {
@@ -90,7 +94,7 @@ export = (RED: nodered.NodeAPI): void => {
         let message: GraphMessage = {
             payload: payload,
         };
-        graphNode.send(message);
+        graphNode.send([null, message]);
     });
 
 

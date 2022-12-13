@@ -4,6 +4,10 @@ module.exports = function (RED) {
     function DTAsset(config) {
         var _this = this;
         RED.nodes.createNode(this, config);
+        // console.log('##################################');
+        // console.log('DTAsset config', config);
+        // console.log('----------------------------------');
+        // console.log('DTAsset this', this);
         this.on('input', function (msg, send, done) {
             var data = {
                 property: msg.payload,

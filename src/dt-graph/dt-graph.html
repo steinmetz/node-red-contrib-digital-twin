@@ -12,21 +12,22 @@
             version: { value: "1.0.0+1" },
         },
         inputs: 1,
-        outputs: 1,
+        outputs: 2,
         icon: "hash.svg",
         label: function () {
             return this.name || "dt-graph";
         },
-        onpaletteadd: function () {            
+        onpaletteadd: function () {
             RED.events.on("deploy", function (msg) {
                 let allNodes = RED.nodes.createCompleteNodeSet();
                 let allDTNodes = allNodes.filter((node) =>
                     node.type.startsWith("dt-")
                 );
-               
+
+                console.time("deploy");
                 //checks if model has dt nodes
                 // TODO: https://discourse.nodered.org/t/listen-to-events-only-when-node-is-in-use/67970/3
-                if(allDTNodes.length == 0) return;                
+                if (allDTNodes.length == 0) return;
 
                 let nodes = JSON.stringify(allDTNodes);
                 let deletedNodesJSON = JSON.stringify(deletedNodes);
@@ -62,7 +63,7 @@
     <div class="form-row">
         <label for="node-input-version"><i class="fa fa-tag"></i> Model version</label>
         <input type="text" id="node-input-version" placeholder="1.0.0+1" />
-    </div> 
+    </div>
     </div>
     <div class="form-tips"><b>Tip:</b> This is here to help.</div>
 </script>
