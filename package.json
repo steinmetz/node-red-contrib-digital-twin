@@ -15,7 +15,7 @@
             "dt-property": "src/dt-property/dt-property.js",
             "dt-relation": "src/dt-relation/dt-relation.js",
             "dt-model": "src/dt-model/dt-model.js",
-            "dt-state": "src/dt-model/dt-state.js"
+            "dt-state": "src/dt-state/dt-state.js"
         },
         "version": ">=1.3.0"
     },
