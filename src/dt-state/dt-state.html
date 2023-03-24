@@ -1,35 +1,360 @@
-<script type="text/javascript">
-    RED.nodes.registerType('dt-state', {
-        // node definition
-        category: 'digital twin',
-        color: '#FFAAAA',
-        defaults: {
-            name: { value: "", required: true }
-        },
-        inputs: 1,
-        outputs: 1,
-        icon: 'hash.svg',
-        label: function () {
-            return this.name || 'dt-state';
-        }
-    });
-</script>
-
 <script type="text/html" data-template-name="dt-state">
+
     <div class="form-row">
         <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
-        <input type="text" id="node-input-name" placeholder="Name">
+        <div style="display: inline-block; width: calc(100% - 105px)"><input type="text" id="node-input-name" placeholder="Name"></div>
     </div>
     <div class="form-tips"><b>Tip:</b> This is here to help.</div>
-</script>
+    <div class="form-row func-tabs-row">
+        <ul style="min-width: 600px; margin-bottom: 20px;" id="func-tabs"></ul>
+    </div>
+    <div id="func-tabs-content" style="min-height: calc(100% - 95px);">
+        <div id="func-tab-config" style="display:none">
+            <div class="form-row node-input-property-container-row">
+                <ol id="node-input-property-container"></ol>
+            </div>
+        </div>
 
-<script type="text/html" data-help-name="dt-state">
-   <p>Some useful help text to introduce the STATE NODE.</p>
-   <h3>Outputs</h3>
-       <dl class="message-properties">
-       <dt>payload
-           <span class="property-type">string | buffer</span>
-       </dt>
-   <h3>Details</h3>
-   <p>Some more information about the node.</p>
+        <div id="func-tab-body" style="display:none">
+            <div class="form-row node-text-editor-row" style="position:relative">
+                <div style="height: 220px; min-height:150px;" class="node-text-editor" id="node-input-func-editor" ></div>
+                <div style="position: absolute; right:0; bottom: calc(100% - 20px); z-Index: 10;"><button type="button" id="node-function-expand-js" class="red-ui-button red-ui-button-small"><i class="fa fa-expand"></i></button></div>
+            </div>
+        </div>
+
+    </div>
 </script>
+<script type="text/html" data-help-name="dt-state">
+    <p>Some useful help text to introduce the STATE NODE.</p>
+    <h3>Outputs</h3>
+        <dl class="message-properties">
+        <dt>payload
+            <span class="property-type">string | buffer</span>
+        </dt>
+    <h3>Details</h3>
+    <p>Some more information about the node.</p>
+ </script>
+
+<script type="text/javascript">
+     (function() {
+    
+    function resizeDialog(size) {
+        size = size || { height: $(".red-ui-tray-content form").height() }
+        var rows = $("#dialog-form>div:not(.node-input-property-container-row):visible");
+        var height = size.height;
+        for (var i=0; i<rows.length; i++) {
+            height -= $(rows[i]).outerHeight(true);
+        }
+        var editorRow = $("#dialog-form>div.node-input-property-container-row");
+        height -= (parseInt(editorRow.css("marginTop"))+parseInt(editorRow.css("marginBottom")));
+        height += 16;
+        $("#node-input-property-container").editableList('height',height);
+    }
+    /** Retrieve editableList items (refactored for re-use in the form inject button)*/
+    function getProps(el, legacy) {
+        var result = {
+            props: []
+        }
+        el.each(function(i) {
+            var prop = $(this);
+            var p = {
+                p:prop.find(".node-input-prop-property-name").typedInput('value')
+            };
+            if (p.p) {
+                p.v = prop.find(".node-input-prop-property-value").typedInput('value');
+                p.vt = prop.find(".node-input-prop-property-value").typedInput('type');
+                if(legacy) {
+                    if (p.p === "payload") { // save payload to old "legacy" property
+                        result.payloadType = p.vt;
+                        result.payload = p.v;
+                        delete p.v;
+                        delete p.vt;
+                    } else if (p.p === "topic" && p.vt === "str") {
+                        result.topic = p.v;
+                        delete p.v;
+                    }
+                }
+                result.props.push(p);
+            }
+        });
+        return result;
+    }
+    RED.nodes.registerType('dt-state',{
+        color:"#fdd0a2",
+        category: 'digital twin',
+        defaults: {
+            name: {value:""},
+            props:{value:[{p:""},{p:"",vt:"str"}]},
+            topic: {value:""},
+            payload: {value:""},
+            payloadType: {value:"str"},
+        },
+        inputs:1,
+        outputs:1,
+        icon: "hash.svg",
+        label:function(customProps) {
+                var suffix = "";
+                var payload = "";
+                var payloadType = "str";
+                var topic = "";
+                if (customProps) {
+                    for (var i=0;i<customProps.length;i++) {
+                        if (customProps[i].p === "payload") {
+                            payload = customProps[i].v;
+                            payloadType = customProps[i].vt;
+                        } else if (customProps[i].p === "topic") {
+                            topic = customProps[i].v;
+                        }
+                    }
+                } else {
+                    payload = this.payload || "";
+                    payloadType = this.payloadType || "str";
+                    topic = this.topic || "";
+                }
+                
+            },
+        oneditprepare: function() {
+            var node = this;
+            var payloadType = node.payloadType;
+            if (node.payloadType == null) {
+                        payloadType = "str";   
+                }
+                 else if (node.payloadType === 'string' || node.payloadType === 'none') {
+                    payloadType = "str";
+                };
+    
+                /* */
+    
+                var eList = $('#node-input-property-container').css('min-height','120px').css('min-width','450px');
+    
+                eList.editableList({
+                    addItem: function(container,i,opt) {
+                        var prop = opt;
+                       
+                        var row = $('<div/>').appendTo(container);
+    
+                        var propertyName = $('<input/>',{class:"node-input-prop-property-name",type:"text"})
+                            .css("width","30%")
+                            .appendTo(row)
+                            .typedInput({types:['msg']});
+    
+                        $('<div/>',{style: 'display:inline-block; padding:0px 6px;'})
+                            .text('=')
+                            .appendTo(row);
+    
+                        var propertyValue = $('<input/>',{class:"node-input-prop-property-value",type:"text"})
+                            .css("width","calc(70% - 30px)")
+                            .appendTo(row)
+                            .typedInput({default:prop.vt || 'str',types:['flow','global','str','num','bool','json','bin','date','jsonata','env','msg']});
+    
+                        propertyName.typedInput('value',prop.p);
+                        propertyValue.typedInput('value',prop.v);
+                    },
+                    removable: true,
+                    sortable: true
+                });
+                
+                for (var i=0; i<node.props.length; i++) {
+                    var prop = node.props[i];
+                    var newProp = { p: prop.p, v: prop.v, vt: prop.vt };
+                    if (newProp.v === undefined) {
+                        if (prop.p === 'payload') {
+                            newProp.v = node.payload ? node.payload : '';
+                            newProp.vt = payloadType ? payloadType : 'date';
+                        } else if (prop.p === 'topic' && prop.vt === "str") {
+                            newProp.v =  node.topic ? node.topic : '';
+                        }
+                    }
+                    if (newProp.vt === "string") {
+                        // Fix bug in pre 2.1 where an old Inject node might have
+                        // a migrated rule with type 'string' not 'str'
+                        newProp.vt = "str";
+                    }
+                    eList.editableList('addItem',newProp);
+                };
+    
+
+            var tabs = RED.tabs.create({
+                id: "func-tabs",
+                onchange: function(tab) {
+                    $("#func-tabs-content").children().hide();
+                    $("#" + tab.id).show();
+                    let editor = $("#" + tab.id).find('.monaco-editor').first();
+                    if(editor.length) {
+                        if(node.editor.nodered && node.editor.type == "monaco") {
+                            node.editor.nodered.refreshModuleLibs(getLibsList());
+                        }
+                        RED.tray.resize();
+                        //auto focus editor on tab switch
+                        if (node.initEditor.getDomNode() == editor[0]) {
+                            node.initEditor.focus();
+                        } else if (node.editor.getDomNode() == editor[0]) {
+                            node.editor.focus();
+                        } else if (node.finalizeEditor.getDomNode() == editor[0]) {
+                            node.finalizeEditor.focus();
+                        }
+                    }
+                }
+            });
+            tabs.addTab({
+                id: "func-tab-config",
+                iconClass: "fa fa-cog",
+                label: node._("Rules")
+            });
+            tabs.addTab({
+                id: "func-tab-body",
+                label: node._("function.label.function")
+            });
+            tabs.activateTab("func-tab-body");
+
+            $( "#node-input-outputs" ).spinner({
+                min: 0,
+                max: 500,
+                change: function(event, ui) {
+                    var value = parseInt(this.value);
+                    value = isNaN(value) ? 1 : value;
+                    value = Math.max(value, parseInt($(this).attr("aria-valuemin")));
+                    value = Math.min(value, parseInt($(this).attr("aria-valuemax")));
+                    if (value !== this.value) { $(this).spinner("value", value); }
+                }
+            });
+
+            var buildEditor = function(id, stateId, focus, value, defaultValue, extraLibs, offset) {
+                var editor = RED.editor.createEditor({
+                    id: id,
+                    mode: 'ace/mode/nrjavascript',
+                    value: value || defaultValue || "",
+                    stateId: stateId,
+                    focus: true,
+                    globals: {
+                        msg:true,
+                        context:true,
+                        RED: true,
+                        util: true,
+                        flow: true,
+                        global: true,
+                        console: true,
+                        Buffer: true,
+                        setTimeout: true,
+                        clearTimeout: true,
+                        setInterval: true,
+                        clearInterval: true
+                    },
+                    extraLibs: extraLibs
+                });
+                if (defaultValue && value === "") {
+                    editor.moveCursorTo(defaultValue.split("\n").length +offset, 0);
+                }
+                editor.__stateId = stateId;
+                return editor;
+            }
+            this.initEditor = buildEditor('node-input-init-editor', this.id + "/" + "initEditor", false, $("#node-input-initialize").val(), RED._("node-red:function.text.initialize"), undefined, 0);
+            this.editor = buildEditor('node-input-func-editor', this.id + "/" + "editor", true, $("#node-input-func").val(), undefined, node.libs || [], undefined, -1);
+            this.finalizeEditor = buildEditor('node-input-finalize-editor', this.id + "/" + "finalizeEditor", false, $("#node-input-finalize").val(), RED._("node-red:function.text.finalize"), undefined, 0);
+
+            RED.library.create({
+                url:"functions", // where to get the data from
+                type:"function", // the type of object the library is for
+                editor:this.editor, // the field name the main text body goes to
+                mode:"ace/mode/nrjavascript",
+                fields:[
+                    'name', 'outputs',
+                    {
+                        name: 'initialize',
+                        get: function() {
+                            return node.initEditor.getValue();
+                        },
+                        set: function(v) {
+                            node.initEditor.setValue(v||RED._("node-red:function.text.initialize"), -1);
+                        }
+                    },
+                    {
+                        name: 'finalize',
+                        get: function() {
+                            return node.finalizeEditor.getValue();
+                        },
+                        set: function(v) {
+                            node.finalizeEditor.setValue(v||RED._("node-red:function.text.finalize"), -1);
+                        }
+                    },
+                    {
+                        name: 'info',
+                        get: function() {
+                            return node.infoEditor.getValue();
+                        },
+                        set: function(v) {
+                            node.infoEditor.setValue(v||"", -1);
+                        }
+                    }
+                ],
+                ext:"js"
+            });
+
+            var expandButtonClickHandler = function(editor) {
+                return function (e) {
+                    e.preventDefault();
+                    var value = editor.getValue();
+                    editor.saveView(`inside function-expandButtonClickHandler ${editor.__stateId}`);
+                    var extraLibs = node.libs || [];
+                    RED.editor.editJavaScript({
+                        value: value,
+                        width: "Infinity",
+                        stateId: editor.__stateId,
+                        mode: "ace/mode/nrjavascript",
+                        focus: true,
+                        cancel: function () {
+                            setTimeout(function () {
+                                editor.focus();
+                            }, 250);
+                        },
+                        complete: function (v, cursor) {
+                            editor.setValue(v, -1);
+                            setTimeout(function () {
+                                editor.restoreView();
+                                editor.focus();
+                            }, 250);
+                        },
+                        extraLibs: extraLibs
+                    });
+                }
+            }
+            $("#node-init-expand-js").on("click", expandButtonClickHandler(this.initEditor));
+            $("#node-function-expand-js").on("click", expandButtonClickHandler(this.editor));
+            $("#node-finalize-expand-js").on("click", expandButtonClickHandler(this.finalizeEditor));
+
+            RED.popover.tooltip($("#node-init-expand-js"), RED._("node-red:common.label.expand"));
+            RED.popover.tooltip($("#node-function-expand-js"), RED._("node-red:common.label.expand"));
+            RED.popover.tooltip($("#node-finalize-expand-js"), RED._("node-red:common.label.expand"));
+
+            if (RED.settings.functionExternalModules !== false) {
+                prepareLibraryConfig(node);
+            }
+        },  
+        oneditsave: function() {
+               
+               /* Gather the properties */
+               var items = $("#node-input-property-container").editableList('items');
+               delete this.payloadType;
+               delete this.payload;
+               this.topic = "";
+               var result = getProps(items, true);
+               this.props = result.props;
+               if(result.hasOwnProperty('payloadType')) { this.payloadType = result.payloadType; };
+               if(result.hasOwnProperty('payload')) { this.payload = result.payload; };
+               if(result.hasOwnProperty('topic')) { this.topic = result.topic; };
+           },
+           oneditresize: resizeDialog
+    });
+})();
+</script>
+<script type="text/html" data-help-name="dt-state">
+    <p>Some useful help text to introduce the STATE NODE.</p>
+    <h3>Outputs</h3>
+        <dl class="message-properties">
+        <dt>payload
+            <span class="property-type">string | buffer</span>
+        </dt>
+    <h3>Details</h3>
+    <p>Some more information about the node.</p>
+ </script>
+ 
