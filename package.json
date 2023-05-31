@@ -27,7 +27,8 @@
         "build": "tsc",
         "build1": "tsc && cd src/ && find -name '*.html' | cpio -pdm  ../nodes/",
         "clean": "rimraf src/**/*.js",
-        "test": "echo \"Error: no test specified\" && exit 1"
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "debug": "node $(readlink -f `which node-red`)"
     },
     "repository": {
         "type": "git",

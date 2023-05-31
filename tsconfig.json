@@ -5,6 +5,7 @@
     "compilerOptions": {
         "rootDir": "src",
         "target": "es5",
-        "module": "commonjs"
+        "module": "commonjs",
+        "sourceMap": true
     }
 }
