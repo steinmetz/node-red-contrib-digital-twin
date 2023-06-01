@@ -49,7 +49,9 @@ export class Cypher {
                 for (let property of asset.properties) {
                     let proAlias = `p${propertyAliasCounter}`;
                     cypher.push(this.createPropertyCypher(property, proAlias));
-                    cypher.push(` MERGE (${assetAlias})-[:${propertyRelationName}]->(${proAlias}) `);
+                    cypher.push(`MATCH(${assetAlias}:Asset {nodered_id: '${asset.id}'})
+                                MATCH(${proAlias}:Property {nodered_id: '${property.id}'})
+                                MERGE (${assetAlias})-[:${propertyRelationName}]->(${proAlias}) `);
                     propertyAliasCounter++;
                 }
             }
