@@ -18,3 +18,4 @@ module.exports = function (RED) {
     ;
     RED.nodes.registerType('dt-property', DTProperty);
 };
+//# sourceMappingURL=dt-property.js.map

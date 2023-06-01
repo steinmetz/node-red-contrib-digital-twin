@@ -54,7 +54,7 @@ var Cypher = /** @class */ (function () {
                     var property = _b[_a];
                     var proAlias = "p".concat(propertyAliasCounter);
                     cypher.push(this.createPropertyCypher(property, proAlias));
-                    cypher.push(" MERGE (".concat(assetAlias, ")-[:").concat(propertyRelationName, "]->(").concat(proAlias, ") "));
+                    cypher.push("MATCH(".concat(assetAlias, ":Asset {nodered_id: '").concat(asset.id, "'})\n                                MATCH(").concat(proAlias, ":Property {nodered_id: '").concat(property.id, "'})\n                                MERGE (").concat(assetAlias, ")-[:").concat(propertyRelationName, "]->(").concat(proAlias, ") "));
                     propertyAliasCounter++;
                 }
             }
@@ -108,3 +108,4 @@ var Cypher = /** @class */ (function () {
     return Cypher;
 }());
 exports.Cypher = Cypher;
+//# sourceMappingURL=cypher.js.map

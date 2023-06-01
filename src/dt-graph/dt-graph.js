@@ -136,3 +136,4 @@ module.exports = function (RED) {
     ;
     RED.nodes.registerType('dt-graph', DTGraph);
 };
+//# sourceMappingURL=dt-graph.js.map

@@ -10,3 +10,4 @@ module.exports = function (RED) {
     ;
     RED.nodes.registerType('dt-relation', DTRelation);
 };
+//# sourceMappingURL=dt-relation.js.map

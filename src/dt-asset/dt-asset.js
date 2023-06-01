@@ -15,3 +15,4 @@ module.exports = function (RED) {
     ;
     RED.nodes.registerType('dt-asset', DTAsset);
 };
+//# sourceMappingURL=dt-asset.js.map

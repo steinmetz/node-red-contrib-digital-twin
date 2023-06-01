@@ -9,3 +9,4 @@ module.exports = function (RED) {
     ;
     RED.nodes.registerType('dt-model', DTModel);
 };
+//# sourceMappingURL=dt-model.js.map

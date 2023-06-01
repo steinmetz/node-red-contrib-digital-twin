@@ -12,3 +12,4 @@ module.exports = function (RED) {
     });
     RED.nodes.registerType('dt-action', DTAction);
 };
+//# sourceMappingURL=dt-action.js.map

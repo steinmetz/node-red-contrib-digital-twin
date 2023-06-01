@@ -10,3 +10,4 @@ module.exports = function (RED) {
     ;
     RED.nodes.registerType('dt-event', DTEvent);
 };
+//# sourceMappingURL=dt-event.js.map
