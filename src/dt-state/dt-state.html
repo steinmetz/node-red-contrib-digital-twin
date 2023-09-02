@@ -1,364 +1,1441 @@
-<script type="text/html" data-template-name="dt-state">
+<style>
+	#red-ui-sidebar-dtstate-content, #red-ui-sidebar-dtstate-graph {
+		width: 100%;
+		height: 100%;
+	}
 
-    <div class="form-row">
-        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
-        <div style="display: inline-block; width: calc(100% - 105px)"><input type="text" id="node-input-name" placeholder="Name"></div>
+	#red-ui-sidebar-dtstate-content {
+		overflow: hidden;
+	}
+
+	#red-ui-sidebar-dtstate-context {
+		padding: 8px 10px;
+	}
+
+	div.red-ui-sidebar-dtstate-settings {
+		font-size: x-small;
+		display: inline-block;
+	}
+
+	div.red-ui-sidebar-dtstate-settings label,
+	div.red-ui-sidebar-dtstate-settings select,
+	div.red-ui-sidebar-dtstate-settings input {
+		font-size: x-small !important;
+	}
+
+	div.red-ui-sidebar-dtstate-settings label {
+		display: inline;
+		margin-right: 6px;
+	}
+
+	div.red-ui-sidebar-dtstate-settings select {
+		width: auto;
+		height: auto;
+		line-height: inherit;
+		margin: 0;
+		padding: 4px;
+	}
+
+	div.red-ui-sidebar-dtstate-settings input {
+		width: auto;
+		height: auto !important;
+		line-height: inherit !important;
+		margin: 0 !important;
+		padding: 0 0 0 4px !important;
+	}
+</style>
+
+<script type="text/x-red" data-template-name="dt-state">
+	<div class="form-row">
+		<label for="node-input-name"><i class="icon-tag"></i> Name</label>
+		<input type="text" id="node-input-name" placeholder="Name">
+	</div>
+	<div class="form-row" style="margin-bottom: 0px;">
+        <ul style="min-width: 600px; margin-bottom: 20px;" id="node-input-xstateDefinition"></ul>
     </div>
-    <div class="form-tips"><b>Tip:</b> This is here to help.</div>
-    <div class="form-row func-tabs-row">
-        <ul style="min-width: 600px; margin-bottom: 20px;" id="func-tabs"></ul>
-    </div>
-    <div id="func-tabs-content" style="min-height: calc(100% - 95px);">
-        <div id="func-tab-config" style="display:none">
-            <div class="form-row node-input-property-container-row">
-                <ol id="node-input-property-container"></ol>
+    <div id="state-tabs-content" style="min-height: calc(100% - 95px);">
+        <div id="state-rule-tab" style="display:none">
+            <div class="form-row node-input-option-container-row" style="margin-bottom:0px; width:100%; min-width:520px">
+                <label style="vertical-align:top;"><i class="fa fa-list-alt"></i> <span data-i18n="state_rule.statedefination"> state defination</label>
+                <div style="display:inline-block; width:78%; border:1px solid var(--red-ui-form-input-border-color, #ccc); border-radius:5px; box-sizing:border-box;">
+                  <div class="red-ui-tray-header" style="width:100%; display: inline-block; padding-top:10px; padding-bottom:10px; border-top:0px solid; border-radius:5px 5px 0 0; border-bottom:1px solid var(--red-ui-form-input-border-color, #ccc);">
+                      <div style="width:94%; display:inline-block; margin-left:27px">
+                        <div style="width:20%; text-align:center; float:left;" data-i18n="rulecr"> Current State </span></div>
+                        <div style="width:20%; text-align:center; float:left; margin-left:9px" data-i18n="rulete"> Transition Event </span></div>
+                        <div style="width:20%; text-align:center; float:left; margin-left:9px" data-i18n="rulens"> Next State </div>
+                        <div style="margin-left:7px; width:16%; text-align:center; float:left; margin-left:9px" data-i18n="ui_form.label.type"> type</div>
+                        <div style="width:12%; text-align:center; float:left;" data-i18n="ui_form.label.remove"> remove </div>
+                      </div>
+                  </div>
+                  <div id="node-input-option-container-div" style=" height: 257px; padding: 5px; overflow-y:scroll;">
+                    <ol id="node-input-option-container" style=" list-style-type:none; margin: 0;"></ol>
+                  </div>
+                </div>
+            </div>
+            <div class="form-row">
+                <a href="#" class="editor-button editor-button-small" id="node-input-add-option" style="margin-top: 4px; margin-left: 103px;"><i class="fa fa-plus"></i> <span data-i18n="ui_form.label.element"></span></a>
             </div>
         </div>
-
-        <div id="func-tab-body" style="display:none">
-            <div class="form-row node-text-editor-row" style="position:relative">
-                <div style="height: 220px; min-height:150px;" class="node-text-editor" id="node-input-func-editor" ></div>
-                <div style="position: absolute; right:0; bottom: calc(100% - 20px); z-Index: 10;"><button type="button" id="node-function-expand-js" class="red-ui-button red-ui-button-small"><i class="fa fa-expand"></i></button></div>
-            </div>
-        </div>
-
+        <div id="state-text-editor" style="display:none" >
+             <div class="form-row node-text-editor-row" style="position:relative">
+             <div style="position: absolute; right:0; bottom:calc(100% + 3px);"><button id="node-dtstate-expand-js" class="red-ui-button red-ui-button-small"><i class="fa fa-expand"></i></button></div>
+             <div style="height: 800px; min-height:150px;" class="node-text-editor" id="node-input-xstateDefinition-editor" ></div>
+             </div>
+        </div>    
     </div>
 </script>
-<script type="text/html" data-help-name="dt-state">
-    <p>Some useful help text to introduce the STATE NODE.</p>
-    <h3>Outputs</h3>
-        <dl class="message-properties">
-        <dt>payload
-            <span class="property-type">string | buffer</span>
-        </dt>
-    <h3>Details</h3>
-    <p>Some more information about the node.</p>
- </script>
 
 <script type="text/javascript">
-     (function() {
-    
-    function resizeDialog(size) {
-        size = size || { height: $(".red-ui-tray-content form").height() }
-        var rows = $("#dialog-form>div:not(.node-input-property-container-row):visible");
-        var height = size.height;
-        for (var i=0; i<rows.length; i++) {
-            height -= $(rows[i]).outerHeight(true);
-        }
-        var editorRow = $("#dialog-form>div.node-input-property-container-row");
-        height -= (parseInt(editorRow.css("marginTop"))+parseInt(editorRow.css("marginBottom")));
-        height += 16;
-        $("#node-input-property-container").editableList('height',height);
+// This code runs within the browser
+if( !RED ) {
+    var RED = {}
+}
+let dtstateUtilExports = (function() {
+
+    function getCurrentlySelectedNodeId() {
+        let selector = $('#red-ui-sidebar-dtstate-display-selected');
+        let value    = selector.val();
+
+        if( !value ) return null;
+
+        return {
+            id: value,
+            rootId:  selector.children('option:selected').attr('data-reveal-id'),
+            aliasId: selector.children('option:selected').attr('data-alias-id'),
+            label:   selector.children('option:selected').text()
+        };
     }
-    /** Retrieve editableList items (refactored for re-use in the form inject button)*/
-    function getProps(el, legacy) {
-        var result = {
-            props: []
+
+    var updateContextStack = [];
+    var updateContextBusy  = false;
+
+    function updateContextFcn(data) {
+        // Limit to 10 updates per second
+        if( data && data.id && data.id === getCurrentlySelectedNodeId().id ) { updateContextStack.push(data.context); }
+        if( !updateContextBusy && updateContextStack.length > 0 ) {
+            updateContextBusy = true;
+
+            // Do the actual animation and data update
+            let context = updateContextStack.shift();
+
+            let contextElement = RED.utils.createObjectElement( context, {
+                key: /*true*/null,
+                typeHint: "Object",
+                hideKey: false
+             } );
+
+            $('#red-ui-sidebar-dtstate-context-data').html(contextElement)
+
+            setTimeout(() => {
+                updateContextBusy = false;
+                updateContextFcn();
+            }, 100);
+            if( updateContextStack.length > 5 ) updateContextStack = updateContextStack.splice(-5);
         }
-        el.each(function(i) {
-            var prop = $(this);
-            var p = {
-                p:prop.find(".node-input-prop-property-name").typedInput('value')
-            };
-            if (p.p) {
-                p.v = prop.find(".node-input-prop-property-value").typedInput('value');
-                p.vt = prop.find(".node-input-prop-property-value").typedInput('type');
-                if(legacy) {
-                    if (p.p === "payload") { // save payload to old "legacy" property
-                        result.payloadType = p.vt;
-                        result.payload = p.v;
-                        delete p.v;
-                        delete p.vt;
-                    } else if (p.p === "topic" && p.vt === "str") {
-                        result.topic = p.v;
-                        delete p.v;
-                    }
+    }
+
+    var animationStack = [];
+    var animationBusy  = false;
+
+    function animateFcn(data) {
+        // Limit to 10 updates per second
+        if( data && data.state && (data.state.changed === true || data.state.changed === undefined) ) { animationStack.push(data); }
+        if( !animationBusy && animationStack.length > 0 ) {
+            animationBusy = true;
+
+            // Do the actual animation and data update
+            let data = animationStack.shift();
+
+            // Recurse into state
+            function getStatepaths(state, parentState) {
+                if( typeof state === "string" ) return [(parentState ? parentState + "." + state : state)]; 
+                
+                if( !state ) return parentState;
+                
+                let substates = Object.keys(state);
+                
+                let statePaths = [];
+                for( let substate of substates ) {
+                    let substatePath = parentState ? parentState + "." + substate : substate;
+                    if( state[substate] ) statePaths.push(substatePath);
+                    statePaths = statePaths.concat(getStatepaths(state[substate], substatePath));
                 }
-                result.props.push(p);
+                //console.log(statePaths)
+                return statePaths;
+            }
+
+            let activeStates = getStatepaths(data.state.state);
+
+            // Reset all other states
+            let elements = $(
+                '#red-ui-sidebar-dtstate-content svg g.graph g:not([class="edge"])'
+            );
+            
+            elements.children('*[stroke][stroke!="transparent"][stroke!="none"]').attr('stroke','#000000');
+
+            // Style active states
+            for( let activeState of activeStates ) {
+                elements
+                    .has('title:contains(' + data.machineId + '.' + activeState + '/)')
+                    .has('title:not(:contains(/initial))')
+                    .children('*[stroke][stroke!="transparent"][stroke!="none"]')
+                    .attr('stroke','#FF0000');
+            }
+            
+            //updateContextFcn(data.state.context);
+
+            setTimeout(() => {
+                animationBusy = false;
+                animateFcn();
+            }, 100);
+            if( animationStack.length > 5 ) animationStack = animationStack.splice(-5);
+        }
+    }
+
+    function setupZoom(container, svgElement) {
+        // Zoom & Pan functions
+        //const svgelement = document.getElementById("svgImage");
+        //const container = document.getElementById("svgContainer");
+
+        var currentViewBoxCfg;
+        try {
+            currentViewBoxCfg = svgElement.getAttribute("viewBox");
+            currentViewBoxCfg = currentViewBoxCfg.split(/[\n\r\s]+/gi);
+            if( Array.isArray( currentViewBoxCfg ) && currentViewBoxCfg.length == 4 ) {
+                currentViewBoxCfg = currentViewBoxCfg.map( e => parseFloat(e) );
+                if( currentViewBoxCfg.some( e => !Number.isFinite(e)) )
+                    throw("Invalid viewbox");
+            } else {
+                throw("Invalid viewbox");
+            }
+        }
+        catch( err ) {
+            currentViewBoxCfg = null;
+        }
+
+        var viewBox;
+        if( !currentViewBoxCfg ) {
+            viewBox = { x: 0, y: 0, w: svgElement.clientWidth, h: svgElement.clientHeight }; //getAttribute("width"), h: svgElement.getAttribute("height") };
+            svgElement.setAttribute('viewBox', `${viewBox.x} ${viewBox.y} ${viewBox.w} ${viewBox.h}`);
+        } else {
+            viewBox = { x: currentViewBoxCfg[0], y: currentViewBoxCfg[1], w: currentViewBoxCfg[2], h: currentViewBoxCfg[3] };
+        }
+        
+        var isPanning = false;
+        var startPoint = { x: 0, y: 0 };
+        var endPoint = { x: 0, y: 0 };;
+        var scale = 1;
+
+        container.onmousewheel = function (e) {
+            e.preventDefault();
+
+            const svgSize = { w: svgElement.clientWidth, h: svgElement.clientHeight };
+            var w = viewBox.w;
+            var h = viewBox.h;
+            var mx = e.offsetX;//mouse x  
+            var my = e.offsetY;
+            var dw = w * -Math.sign(e.deltaY) * 0.05;
+            var dh = h * -Math.sign(e.deltaY) * 0.05;
+            var dx = dw * mx / svgSize.w;
+            var dy = dh * my / svgSize.h;
+            viewBox = { x: viewBox.x + dx, y: viewBox.y + dy, w: viewBox.w - dw, h: viewBox.h - dh };
+            scale = svgSize.w / viewBox.w;
+            //zoomValue.innerText = `${Math.round(scale * 100) / 100}`;
+            svgElement.setAttribute('viewBox', `${viewBox.x} ${viewBox.y} ${viewBox.w} ${viewBox.h}`);
+        }
+
+
+        container.onmousedown = function (e) {
+            isPanning = true;
+            startPoint = { x: e.x, y: e.y };
+        }
+
+        container.onmousemove = function (e) {
+            if (isPanning) {
+                endPoint = { x: e.x, y: e.y };
+                var dx = (startPoint.x - endPoint.x) / scale;
+                var dy = (startPoint.y - endPoint.y) / scale;
+                var movedViewBox = { x: viewBox.x + dx, y: viewBox.y + dy, w: viewBox.w, h: viewBox.h };
+                svgElement.setAttribute('viewBox', `${movedViewBox.x} ${movedViewBox.y} ${movedViewBox.w} ${movedViewBox.h}`);
+            }
+        }
+
+        container.onmouseup = function (e) {
+            if (isPanning) {
+                endPoint = { x: e.x, y: e.y };
+                var dx = (startPoint.x - endPoint.x) / scale;
+                var dy = (startPoint.y - endPoint.y) / scale;
+                viewBox = { x: viewBox.x + dx, y: viewBox.y + dy, w: viewBox.w, h: viewBox.h };
+                svgElement.setAttribute('viewBox', `${viewBox.x} ${viewBox.y} ${viewBox.w} ${viewBox.h}`);
+                isPanning = false;
+            }
+        }
+
+        container.onmouseleave = function (e) {
+            isPanning = false;
+        }
+    }
+
+    function displayFcn(forceRedraw = false) {
+        idObj = getCurrentlySelectedNodeId();
+        
+        // Clear graphics and get a new one
+        $('#red-ui-sidebar-dtstate-graph').empty();
+        
+        // Show spinner
+        $('#red-ui-sidebar-dtstate-graph').before(
+            $('<div id="red-ui-sidebar-dtstate-spinner">').append(
+                '<i class="fa fa-circle-o-notch fa-spin fa-5x fa-fw"></i> <span>Loading...</span>'
+            ).css( {
+                textAlign: "center",
+                margin: "10px"
+            })
+        );
+
+        $.ajax({
+            url: "dtstate/"+idObj.id+"/getgraph",
+            type:"POST",
+            data: { forceRedraw: forceRedraw },
+            success: function(resp) {
+                $('#red-ui-sidebar-dtstate-spinner').remove();
+                RED.notify(`Successfully rendered state-graph for ${idObj.label}`,{type:"success",id:"dtstate"});
+                
+                $('#red-ui-sidebar-dtstate-graph').replaceWith($(resp).attr("id", "red-ui-sidebar-dtstate-graph"));
+                
+                setupZoom( 
+                    $('#red-ui-sidebar-dtstate-content')[0],
+                    $('#red-ui-sidebar-dtstate-graph')[0] 
+                );
+            },
+            error: function(jqXHR,textStatus,errorThrown) {
+                $('#red-ui-sidebar-dtstate-spinner').remove();
+                if (jqXHR.status == 404) {
+                    RED.notify(RED._("node-red:common.notification.error",{message:"resource not found"}),"error");
+                } else if (jqXHR.status == 500) {
+                    RED.notify("Rendering of the state machine failed.","error");
+                } else if (jqXHR.status == 0) {
+                    RED.notify(RED._("node-red:common.notification.error",{message:RED._("node-red:common.notification.errors.no-response")}),"error");
+                } else {
+                    RED.notify(RED._("node-red:common.notification.error",{message:RED._("node-red:common.notification.errors.unexpected",{status:jqXHR.status,message:textStatus})}),"error");
+                }
+            }    
+        });
+    }
+
+    function resetFcn() {
+
+        // Get selected machine and reset state and context to initial ones
+        let idObj    = getCurrentlySelectedNodeId();
+
+        if( !idObj ) return;
+
+        $.ajax({
+            url: "dtstate/"+idObj.id+"/reset",
+            type:"POST",
+            success: function(resp) {
+                RED.notify("State machine " + idObj.id + " was reset.", { type:"success", id:"dtstate" });
+            },
+            error: function(jqXHR,textStatus,errorThrown) {
+                if (jqXHR.status == 404) {
+                    RED.notify(RED._("node-red:common.notification.error",{message:RED._("node-red:common.notification.errors.not-deployed")}),"error");
+                } else if (jqXHR.status == 500) {
+                    RED.notify("Error during reset. See logs for more info.","error");
+                } else if (jqXHR.status == 0) {
+                    RED.notify(RED._("node-red:common.notification.error",{message:RED._("node-red:common.notification.errors.no-response")}),"error");
+                } else {
+                    RED.notify(RED._("node-red:common.notification.error",{message:RED._("node-red:common.notification.errors.unexpected",{status:jqXHR.status,message:textStatus})}),"error");
+                }
+            }    
+        });
+    }
+
+    function addStatemachineToSidebar(id, label, rootId, aliasId) {
+        $('#red-ui-sidebar-dtstate-display-selected').append(
+            $('<option>')
+                .attr("value", id)
+                .attr("data-reveal-id", rootId)
+                .attr("data-alias-id", aliasId ? aliasId : id)
+                .text(label)
+        );
+    }
+
+    function deleteStatemachineFromSidebar(id) {
+        $('#red-ui-sidebar-dtstate-display-selected').children('[value="' + id + '"]').remove();
+    }
+
+
+    function initFcn() {
+        // Build DOM
+        let content = $('<div>').css({display: "flex", flexDirection: "column", height: "100%"});
+        let toolbar = $('<div class="red-ui-sidebar-header" style="text-align: left;">')
+            .append(
+                $('<form>')
+                    .css({ margin: 0, whiteSpace: "normal" })
+                    .append($('<label>')
+                        .attr("for", "red-ui-sidebar-dtstate-display-selected")
+                        .text("State machine to view:")
+                    )
+                    .append($('<select id="red-ui-sidebar-dtstate-display-selected">')
+                        .change( () => { RED.dtstate.display(); })
+                        .css("width", "100%")
+                        .append($('<option disabled selected value=>').text("-- select machine instance --"))
+                    )
+                    .append('<br>', $('<span class="button-group">')
+                        .append($('<a href="#" id="red-ui-sidebar-dtstate-revealRoot" class="red-ui-sidebar-header-button">')
+                            .append(
+                                '<i class="fa fa-search-minus"></i>'
+                            )
+                            .click(() => { RED.dtstate.revealRoot(); })
+                        ),
+                        $('<span class="button-group">')
+                        .append($('<a href="#" id="red-ui-sidebar-dtstate-reveal" class="red-ui-sidebar-header-button">')
+                            .append(
+                                '<i class="fa fa-search-plus"></i>'
+                            )
+                            .click(() => { RED.dtstate.reveal(); })
+                        ),
+                        $('<span class="button-group">')
+                        .append($('<a href="#" id="red-ui-sidebar-dtstate-reset" class="red-ui-sidebar-header-button">')
+                            .append(
+                                '<i class="fa fa-undo"></i>',
+                                '&nbsp;<span>reset</span>'
+                            )
+                            .click(() => { RED.dtstate.reset(); })
+                        ),
+                        $('<span class="button-group">')
+                        .append($('<a href="#" id="red-ui-sidebar-dtstate-refresh" class="red-ui-sidebar-header-button">')
+                            .append(
+                                '<i class="fa fa-refresh"></i>',
+                                '&nbsp;<span>refresh graph</span>'
+                            )
+                            .click(() => { RED.dtstate.display(true); })
+                        ),
+                        $('<div class="red-ui-sidebar-dtstate-settings">')
+                        .css({marginRight: "8px"})
+                        .append(
+                            '<label for="red-ui-sidebar-dtstate-settings-renderer">Renderer:</label>'
+                        )
+                        .append(
+                            $('<select id="red-ui-sidebar-dtstate-settings-renderer">')
+                                .change( (ev) => {
+                                    RED.dtstate.settings.set('renderer', ev.target.value);
+                                })
+                        ),
+                        $('<div class="red-ui-sidebar-dtstate-settings">')
+                        .css({marginRight: "8px"})
+                        .append(
+                            '<label for="red-ui-sidebar-dtstate-settings-renderTimeoutMs">Render timeout in ms:</label>'
+                        )
+                        .append(
+                            $('<input type="text" id="red-ui-sidebar-dtstate-settings-renderTimeoutMs">')
+                                .css("width", "40px")
+                                .change( (ev) => { 
+                                    try {
+                                        let number = Number.parseInt(ev.target.value);
+                                        if( Number.isNaN(number) || number <= 0 ) throw("Render timeout must be a strictly positive integer.")
+                                        RED.dtstate.settings.set('renderTimeoutMs', number); 
+                                    } catch(err) {
+                                        RED.notify(err,"error");
+                                        // Reset
+                                        RED.dtstate.settings.get('renderTimeoutMs', (resp) => {
+                                            if( resp ) $(ev.target).val(resp);
+                                        })
+                                    }
+                                })
+                        )
+                    )
+            );
+        
+        RED.popover.tooltip(toolbar.find('#red-ui-sidebar-dtstate-reset'),"Reset to initial state");
+        RED.popover.tooltip(toolbar.find('#red-ui-sidebar-dtstate-revealRoot'),"Reveal instance in flow");
+        RED.popover.tooltip(toolbar.find('#red-ui-sidebar-dtstate-reveal'),"Reveal prototype in flow");
+
+        let smxcontext = $('<div id="red-ui-sidebar-dtstate-context">')
+            .append(
+                $('<div id="red-ui-sidebar-dtstate-context-header">').text("Context data:")
+            ).append('<span id="red-ui-sidebar-dtstate-context-data" class="red-ui-debug-msg-payload">');
+            
+        let smxdisplayhelp = $('<div>').css({ fontSize: "x-small", padding: "8px" }).append('<span><b>Pan:</b> Click+drag / <b>Zoom:</b> Mousewheel</span>');
+        let smxdisplay = $('<div id="red-ui-sidebar-dtstate-content">').append('<svg id="red-ui-sidebar-dtstate-graph">');
+
+        toolbar.appendTo(content);
+        smxcontext.appendTo(content);
+        smxdisplayhelp.appendTo(content);
+        smxdisplay.appendTo(content);
+        
+
+        // Populate list
+        var that = this;
+        setTimeout( () => {
+            that.refresh();
+        }, 1000);
+
+        return {
+            content: content,
+            footer: toolbar
+        };
+    }
+
+    function refreshFcn() {
+        let nodes = RED.nodes.filterNodes({type: "dtstate"});
+        
+        // The RED.nodes.filterNodes function returns all nodes (including 
+        // deactivated ones) except of instances within subflows. Actually
+        // only a prototype-node within each subflow prototype is returned 
+        // (no instances!).
+        // 
+        // The property
+        //     node.d
+        // is true for deactivated nodes and the function
+        //     RED.workspaces.contains( node.z )
+        // returns false for prototype nodes within subflows
+        // 
+        // Because the node-red interface is lacking needed functionality we 
+        // instead request the data from the server every time.
+
+        // Clear list
+        $('#red-ui-sidebar-dtstate-display-selected option:not([disabled])').remove();
+        $('#red-ui-sidebar-dtstate-settings-renderer option').remove();
+
+        // Get node ids from server
+        $.ajax({
+            url: "dtstate/getnodes",
+            type:"GET",
+            success: function(resp) {
+                if( !Array.isArray(resp) ) resp = [resp];
+                for( let e of resp ) {
+                    addStatemachineToSidebar(e.id, e.path.labels.join('/'), e.rootId, e.alias);
+                }
+            },
+            error: function(jqXHR,textStatus,errorThrown) {
+                if (jqXHR.status == 404) {
+                    RED.notify(RED._("node-red:common.notification.error",{message:"resource not found"}),"error");
+                } else if (jqXHR.status == 500) {
+                    RED.notify("Retrieval of available state machines failed.","error");
+                } else if (jqXHR.status == 0) {
+                    RED.notify(RED._("node-red:common.notification.error",{message:RED._("node-red:common.notification.errors.no-response")}),"error");
+                } else {
+                    RED.notify(RED._("node-red:common.notification.error",{message:RED._("node-red:common.notification.errors.unexpected",{status:jqXHR.status,message:textStatus})}),"error");
+                }
+            }    
+        });
+
+        // Get available renderers from server
+        RED.dtstate.settings.get("availableRenderers", (resp) => {
+            
+            let selectElement = $('#red-ui-sidebar-dtstate-settings-renderer');
+
+            if( resp ) {
+                
+                if( !Array.isArray(resp) ) resp = [resp];
+                for( let e of resp ) {
+                    selectElement.append(
+                        '<option value="' + e + '">' + e + '</option>'
+                    );
+                }
+            }
+
+            // Set current settings values
+            RED.dtstate.settings.get("renderer", (resp) => {
+                if( resp ) {
+                    selectElement.val(resp);
+                }
+            });
+        });
+
+        RED.dtstate.settings.get("renderTimeoutMs", (resp) => {
+            if( resp ) {
+                $('#red-ui-sidebar-dtstate-settings-renderTimeoutMs').val(resp);
             }
         });
-        return result;
     }
-    RED.nodes.registerType('dt-state',{
-        color:"#fdd0a2",
-        category: 'digital twin',
-        defaults: {
-            name: {value:""},
-            props:{value:[{p:""},{p:"",vt:"str"}]},
-            topic: {value:""},
-            payload: {value:""},
-            payloadType: {value:"str"},
-        },
-        inputs:1,
-        outputs:1,
-        icon: "hash.svg",
-        label:function(customProps) {
-                var suffix = "";
-                var payload = "";
-                var payloadType = "str";
-                var topic = "";
-                if (customProps) {
-                    for (var i=0;i<customProps.length;i++) {
-                        if (customProps[i].p === "payload") {
-                            payload = customProps[i].v;
-                            payloadType = customProps[i].vt;
-                        } else if (customProps[i].p === "topic") {
-                            topic = customProps[i].v;
+
+    function revealFcn() {
+        let idObj = getCurrentlySelectedNodeId();
+
+        if(!idObj) return;
+
+        // Reveal the prototype node within a subflow if it's in a subflow
+        RED.view.reveal(idObj.aliasId);
+    }
+
+    function revealRootFcn() {
+
+        let idObj = getCurrentlySelectedNodeId();
+
+        if(!idObj) return;
+
+        // Reveal the root instance of the node
+        RED.view.reveal(idObj.rootId);
+    }
+
+    function updateSettingsFcn(settings) {
+        if( settings.hasOwnProperty("renderer") ) {
+            $("#red-ui-sidebar-dtstate-settings-renderer").val(settings.renderer); // Don't post event
+        }
+        if( settings.hasOwnProperty("availableRenderers") ) {
+            let o;
+            $("#red-ui-sidebar-dtstate-settings-renderer").children('option').attr('disabled','disabled');
+            for( o of settings.availableRenderers ) {
+                $("#red-ui-sidebar-dtstate-settings-renderer").children('option[value="'+o+'"]')
+                    .removeAttr('disabled');
+            }
+        }
+        if( settings.hasOwnProperty("renderTimeoutMs") ) {
+            $("#red-ui-sidebar-dtstate-settings-renderTimeoutMs").val(settings.renderTimeoutMs); // Don't post event
+        }
+    }
+
+    return {
+        init: initFcn,
+        display: displayFcn,
+        reset: resetFcn,
+        refresh: refreshFcn,
+        addStatemachineToSidebar: addStatemachineToSidebar,
+        deleteStatemachineFromSidebar: deleteStatemachineFromSidebar,
+        animate: animateFcn,
+        updateContext: updateContextFcn,
+        revealRoot: revealRootFcn,
+        reveal: revealFcn,
+        updateSettings: updateSettingsFcn
+    };
+})();
+
+if( RED.dtstate ) Object.assign(RED.dtstate, dtstateUtilExports);
+else RED.dtstate = dtstateUtilExports;
+delete dtstateUtilExports;
+</script>
+<script type="text/javascript">
+// This code runs within the browser
+if( !RED ) {
+    var RED = {}
+}
+if( !RED.dtstate ) {
+    RED.dtstate = {};
+}
+
+RED.dtstate.settings = (function() {
+
+    function setFcn(prop,val,success) {
+        return $.ajax({
+            url: "dtstate/settings",
+            type:"POST",
+            data: { property: prop, value: val },
+            success: success,
+            error: function(jqXHR,textStatus,errorThrown) {
+                if (jqXHR.status == 404) {
+                    RED.notify(RED._("node-red:common.notification.error",{message:"resource not found"}),"error");
+                } else if (jqXHR.status == 500) {
+                    RED.notify("dtstate: Unable to set property " + prop + ".","error");
+                } else if (jqXHR.status == 0) {
+                    RED.notify(RED._("node-red:common.notification.error",{message:RED._("node-red:common.notification.errors.no-response")}),"error");
+                } else {
+                    RED.notify(RED._("node-red:common.notification.error",{message:RED._("node-red:common.notification.errors.unexpected",{status:jqXHR.status,message:textStatus})}),"error");
+                }
+            }    
+        });
+
+    }
+
+    function getFcn(prop, success) {
+        return $.ajax({
+            url: "dtstate/settings",
+            type:"GET",
+            data: { property: prop },
+            success: (resp) => { 
+                if( resp && typeof resp === "object" && resp.hasOwnProperty(prop) ) {
+                    resp = resp[prop];
+                } else resp = null;
+                
+                if(success && typeof success === "function") 
+                    success(resp); 
+            },
+            error: function(jqXHR,textStatus,errorThrown) {
+                if (jqXHR.status == 404) {
+                    RED.notify(RED._("node-red:common.notification.error",{message:"resource not found"}),"error");
+                } else if (jqXHR.status == 500) {
+                    RED.notify("dtstate: Retrieval of property " + prop + " failed.","error");
+                } else if (jqXHR.status == 0) {
+                    RED.notify(RED._("node-red:common.notification.error",{message:RED._("node-red:common.notification.errors.no-response")}),"error");
+                } else {
+                    RED.notify(RED._("node-red:common.notification.error",{message:RED._("node-red:common.notification.errors.unexpected",{status:jqXHR.status,message:textStatus})}),"error");
+                }
+            }    
+        });
+    }
+
+    return {
+        set: setFcn,
+        get: getFcn
+    }
+})();
+
+</script>
+<script type="text/javascript">
+
+// let label = [];
+// let event = [];
+// let value = [];
+
+
+// // Initialize myDictionary
+// let myDictionary = {};
+
+// for (let i = 0; i < label.length; i++) {
+//     let mainKey = label[i];
+//     let subKeys = [event[i]];
+//     let values = [value[i]];
+
+//     myDictionary[mainKey] = {};
+
+//     for (let j = 0; j < subKeys.length; j++) {
+//         myDictionary[mainKey][subKeys[j]] = values[j];
+//     }
+// }
+
+// // Function to convert dictionary to state machine format
+// function convertDictToMachine(initialState, myDictionary) {
+//     let stateEvents = {};
+//     for (let mainKey in myDictionary) {
+//         stateEvents[mainKey] = {};
+//         for (let subKey in myDictionary[mainKey]) {
+//             stateEvents[mainKey][subKey] = myDictionary[mainKey][subKey];
+//         }
+//     }
+//     return {
+//         initial: initialState,
+//         states: stateEvents
+//     };
+// }
+
+// // Function to generate the script
+// // Function to generate the script
+// function generateScriptFromMachine(machine) {
+//     let script = `
+//         // Available variables/objects/functions:
+//         // xstate
+//         // - .Machine
+//         // - .interpret
+//         // - .assign
+//         // - .send
+//         // - .sendParent
+//         // - .spawn
+//         // - .raise
+//         // - .actions
+//         //
+//         // Common
+//         // - setInterval, setTimeout, clearInterval, clearTimeout
+//         // - node.send, node.warn, node.log, node.error
+//         // - context.get, context.set
+//         // - flow.get, flow.set
+//         // - env.get
+//         // - util
+
+//         const { assign } = xstate;
+
+//         /***************************
+//          * Main machine definition * 
+//          ***************************/
+//         return {
+//             machine: {
+//                 initial: '${machine.initial}',
+//                 states: {`;
+
+//     for (let state in machine.states) {
+//         script += `
+//                     ${state}: {
+//                         on: {`;
+
+//         for (let event in machine.states[state]) {
+//             script += `
+//                             ${event}: { target: '${machine.states[state][event]}'},`;
+//         }
+
+//         script += `
+//                         },
+//                     },`;
+//     }
+
+//     script += `
+//                 }
+//             },
+//             // Configuration containing guards, actions, activities, ...
+//             // see above
+//             config: {
+//                 guards: { },
+//                 actions: {  },
+//                 activities: {  }
+//             }
+//         };
+//     `;
+
+//     return script;
+// }
+
+// let initialState = 'idle'; // Set your initial state
+// let machine = convertDictToMachine(initialState, myDictionary);
+
+// // Generate and log the script
+// let script = generateScriptFromMachine(machine);
+// var defaultStateMachineCode = script;
+	// Get the default state machine via file inclusion
+	var defaultStateMachineCode;
+    //= "// Available variables/objects/functions:\r\n// xstate\r\n// - .Machine\r\n// - .interpret\r\n// - .assign\r\n// - .send\r\n// - .sendParent\r\n// - .spawn\r\n// - .raise\r\n// - .actions\r\n//\r\n// Common\r\n// - setInterval, setTimeout, clearInterval, clearTimeout\r\n// - node.send, node.warn, node.log, node.error\r\n// - context.get, context.set\r\n// - flow.get, flow.set\r\n// - env.get\r\n// - util\r\n\r\nconst { assign } = xstate;\r\n\r\n// First define names guards, actions, ...\r\n\r\n/**\r\n * Guards\r\n */\r\nconst maxValueReached = (context, event) => {\r\n  return context.counter >= 10;\r\n};\r\n\r\n/**\r\n * Actions\r\n */\r\nconst incrementCounter = assign({\r\n  counter: (context, event) => context.counter + 1\r\n});\r\n\r\nconst resetCounter = assign({\r\n  counter: (context, event) => {\r\n    // Can send log messages via\r\n    //  - node.log\r\n    //  - node.warn\r\n    //  - node.error\r\n    //node.warn(\"RESET\");\r\n\r\n    // Can send messages to the second outport\r\n    // Specify an array to send multiple messages\r\n    // at once\r\n    //  - node.send(msg)\r\n    node.send({ payload: \"resetCounter\" });\r\n    \r\n    return 0;\r\n  }\r\n});\r\n\r\n/**\r\n * Activities\r\n */\r\nconst doStuff = () => {\r\n  // See https://xstate.js.org/docs/guides/activities.html\r\n  const interval = setInterval(() => {\r\n    node.send({ payload: 'BEEP' });\r\n  }, 1000);\r\n  return () => clearInterval(interval);\r\n};\r\n\r\n/***************************\r\n * Main machine definition * \r\n ***************************/\r\nreturn {\r\n  machine: {\r\n    context: {\r\n      counter: 0\r\n    },\r\n    initial: 'run',\r\n    states: {\r\n      run: {\r\n        initial: 'count',\r\n        states: {\r\n          count: {\r\n            on: {\r\n              '': { target: 'reset', cond: 'maxValueReached' }\r\n            },\r\n            after: {\r\n              1000: { target: 'count', actions: 'incrementCounter' }\r\n            }\r\n          },\r\n          reset: {\r\n            exit: 'resetCounter',\r\n            after: {\r\n              5000: { target: 'count' }\r\n            },\r\n            activities: 'doStuff'\r\n          }\r\n        },\r\n        on: {\r\n          PAUSE: 'pause'\r\n        }\r\n      },\r\n      pause: {\r\n        on: {\r\n          RESUME: 'run'\r\n        }\r\n      }\r\n    }\r\n  },\r\n  // Configuration containing guards, actions, activities, ...\r\n  // see above\r\n  config: {\r\n    guards: { maxValueReached },\r\n    actions: { incrementCounter, resetCounter },\r\n    activities: { doStuff }\r\n  },\r\n  // Define listeners (can be an array of functions)\r\n  //    Functions get called on every state/context update\r\n  listeners: (data) => {\r\n    //node.warn(data.state + \":\" + data.context.counter);\r\n  }\r\n};";
+    // Function to generate the script from values
+// function generateScriptFromValues(label, event, value) {
+//     let script = `
+//         // Available variables/objects/functions:
+//         // xstate
+//         // - .Machine
+//         // - .interpret
+//         // - .assign
+//         // - .send
+//         // - .sendParent
+//         // - .spawn
+//         // - .raise
+//         // - .actions
+//         //
+//         // Common
+//         // - setInterval, setTimeout, clearInterval, clearTimeout
+//         // - node.send, node.warn, node.log, node.error
+//         // - context.get, context.set
+//         // - flow.get, flow.set
+//         // - env.get
+//         // - util
+
+//         const { assign } = xstate;
+
+//         /***************************
+//          * Main machine definition * 
+//          ***************************/
+//         return {
+//             machine: {
+//                 initial: 'idle',
+//                 states: {`;
+
+//     for (let i = 0; i < label.length; i++) {
+//         script += `
+//                     ${label[i]}: {
+//                         on: {`;
+
+//         for (let j = 0; j < event[i].length; j++) {
+//             script += `
+//                             ${event[i][j]}: { target: '${value[i][j]}' },`;
+//         }
+
+//         script += `
+//                         },
+//                     },`;
+//     }
+
+//     script += `
+//                 }
+//             },
+//             // Configuration containing guards, actions, activities, ...
+//             // see above
+//             config: {
+//                 guards: {},
+//                 actions: {},
+//                 activities: {}
+//             }
+//         };
+//     `;
+
+//     return script;
+// }
+function generateScriptFromValues(label, event, value) {
+  let script = `
+        // Available variables/objects/functions:
+        // xstate
+        // - .Machine
+        // - .interpret
+        // - .assign
+        // - .send
+        // - .sendParent
+        // - .spawn
+        // - .raise
+        // - .actions
+        //
+        // Common
+        // - setInterval, setTimeout, clearInterval, clearTimeout
+        // - node.send, node.warn, node.log, node.error
+        // - context.get, context.set
+        // - flow.get, flow.set
+        // - env.get
+        // - util
+
+        const { assign } = xstate;
+
+        /***************************
+         * Main machine definition * 
+         ***************************/
+        return {
+            machine: {
+                initial: 'idle',
+                states: {`;
+
+  for (let i = 0; i < label.length; i++) {
+    script += `
+                    ${label[i]}: {
+                        on: {`;
+
+    for (let j = 0; j < event[i].length; j++) {
+      script += `
+                            ${event[i][j]}: { target: '${value[i][j]}' },`;
+    }
+
+    script += `
+                        },
+                    },`;
+  }
+
+  script += `
+                }
+            },
+            // Configuration containing guards, actions, activities, ...
+            // see above
+            config: {
+                guards: {},
+                actions: {},
+                activities: {}
+            }
+        };
+    `;
+
+  return script;
+}
+
+	RED.nodes.registerType('dt-state',{
+		category: 'digital twin',
+		color: '#FFAAAA',
+		defaults: {
+			name: { value: "" },
+			xstateDefinition: { value: defaultStateMachineCode },
+			noerr: { value:0, required:true, validate:(v) => !v },
+            options: {value:[{value:'', label :'',event :'', type:'', required:true}], validate:function(value) {
+                    if (value.length ) {
+                        for (var i = 0; i < value.length; i++) {
+                            if (!value[i].value) {
+                                return false;
+                            }
                         }
                     }
-                } else {
-                    payload = this.payload || "";
-                    payloadType = this.payloadType || "str";
-                    topic = this.topic || "";
-                }
+                    else {
+                        return false;
+                    }
+                    return true;
+                }, required:true},
+		},
+		inputs:1,
+		outputs:2,
+		icon: "hash.svg",
+		label: function() {
+			return this.name || "dtstate";
+		},
+		inputLabels: "trigger",
+		outputLabels: ["stateChanged", "msgOutput" ], 
+		oneditprepare: function() {
+
+			var that = this;
+
+			this.editor = RED.editor.createEditor({
+				extraLibs: [
+					{var: "xstate", module: "xstate"},
+					{var: "util", module: "util"}
+				], // for monaco
+				id: 'node-input-xstateDefinition-editor',
+				mode: 'ace/mode/nrjavascript',
+				value: $("#node-input-xstateDefinition").val(),
+				globals: {
+					msg:true,
+					context:true,
+					RED: true,
+					util: true,
+					flow: true,
+					global: true,
+					console: true,
+					Buffer: true,
+					setTimeout: true,
+					clearTimeout: true,
+					setInterval: true,
+					clearInterval: true
+				}
                 
-            },
-        oneditprepare: function() {
-            var node = this;
-            var payloadType = node.payloadType;
-            if (node.payloadType == null) {
-                        payloadType = "str";   
-                }
-                 else if (node.payloadType === 'string' || node.payloadType === 'none') {
-                    payloadType = "str";
-                };
-    
-                /* */
-    
-                var eList = $('#node-input-property-container').css('min-height','120px').css('min-width','450px');
-    
-                eList.editableList({
-                    addItem: function(container,i,opt) {
-                        
-                        var prop = { currentState: opt.currentState ?? '', rule: opt.rule ?? '', targetState: opt.targetState ?? ''};
-                       
-                        var row = $('<div/>').appendTo(container);
-     
-                        var currentState = $('<input/>',{class:"node-input-prop-property-currentstate",type:"text"})
-                            .css("width","30%")
-                            .appendTo(row);
-                        
-                        var rule = $('<input/>',{class:"node-input-prop-property-rule",type:"text"})
-                            .css("width","30%")
-                            .appendTo(row);
-
-                        var targetState = $('<input/>',{class:"node-input-prop-property-targetstate",type:"text"})
-                            .css("width","30%")
-                            .appendTo(row) ;
-    
-                        // currentState.typedInput('value',prop.currentState);
-                        rule.typedInput('value',prop.p);
-                        // targetState.typedInput('value',prop.targetState);
-
-                        
-                    },
-                    removable: true,
-                    sortable: true
-                });
-                
-
-                // //this is to fill the already saved properties
-                // for (var i=0; i<node.props.length; i++) {
-                //     var prop = node.props[i];
-                //     var newProp = { p: prop.p, v: prop.v, vt: prop.vt };
-                //     if (newProp.v === undefined) {
-                //         if (prop.p === 'payload') {
-                //             newProp.v = node.payload ? node.payload : '';
-                //             newProp.vt = payloadType ? payloadType : 'date';
-                //         } else if (prop.p === 'topic' && prop.vt === "str") {
-                //             newProp.v =  node.topic ? node.topic : '';
-                //         }
-                //     }
-                //     if (newProp.vt === "string") {
-                //         // Fix bug in pre 2.1 where an old Inject node might have
-                //         // a migrated rule with type 'string' not 'str'
-                //         newProp.vt = "str";
-                //     }
-                //     eList.editableList('addItem',newProp);
-                // };
-    
-
+			});
             var tabs = RED.tabs.create({
-                id: "func-tabs",
+                id: "node-input-xstateDefinition",
                 onchange: function(tab) {
-                    $("#func-tabs-content").children().hide();
+                    $("#state-tabs-content").children().hide();
                     $("#" + tab.id).show();
                     let editor = $("#" + tab.id).find('.monaco-editor').first();
                     if(editor.length) {
-                        if(node.editor.nodered && node.editor.type == "monaco") {
-                            node.editor.nodered.refreshModuleLibs(getLibsList());
+                        if(that.editor.nodered && that.editor.type == "monaco") {
+                            that.editor.nodered.refreshModuleLibs(getLibsList());
                         }
                         RED.tray.resize();
                         //auto focus editor on tab switch
-                        if (node.initEditor.getDomNode() == editor[0]) {
-                            node.initEditor.focus();
-                        } else if (node.editor.getDomNode() == editor[0]) {
-                            node.editor.focus();
-                        } else if (node.finalizeEditor.getDomNode() == editor[0]) {
-                            node.finalizeEditor.focus();
+                        if (that.initEditor.getDomNode() == editor[0]) {
+                            that.initEditor.focus();
+                        } else if (that.editor.getDomNode() == editor[0]) {
+                            that.editor.focus();
+                        } else if (that.finalizeEditor.getDomNode() == editor[0]) {
+                            that.finalizeEditor.focus();
                         }
                     }
                 }
             });
             tabs.addTab({
-                id: "func-tab-config",
+                id: "state-rule-tab",
                 iconClass: "fa fa-cog",
-                label: node._("Rules")
+                label: that._("Rules")
             });
-            // tabs.addTab({
-            //     id: "func-tab-body",
-            //     label: node._("function.label.function")
-            // });
-            tabs.activateTab("func-tab-config");
+            tabs.addTab({
+                id: "state-text-editor",
+                label: that._("state_text_editor")
+            });
+            this.editor.focus();
+            RED.popover.tooltip($("#node-dtstate-expand-js"), RED._("node-red:common.label.expand"));
 
-            // $( "#node-input-outputs" ).spinner({
-            //     min: 0,
-            //     max: 500,
-            //     change: function(event, ui) {
-            //         var value = parseInt(this.value);
-            //         value = isNaN(value) ? 1 : value;
-            //         value = Math.max(value, parseInt($(this).attr("aria-valuemin")));
-            //         value = Math.min(value, parseInt($(this).attr("aria-valuemax")));
-            //         if (value !== this.value) { $(this).spinner("value", value); }
-            //     }
-            // });
+			$("#node-dtstate-expand-js").on("click", function(e) {
+				e.preventDefault();
+				var value = that.editor.getValue();
+				RED.editor.editJavaScript({
+					value: value,
+					width: "Infinity",
+					cursor: that.editor.getCursorPosition(),
+					mode: "ace/mode/nrjavascript",
+					complete: function(v,cursor) {
+						that.editor.setValue(v, -1);
+						that.editor.gotoLine(cursor.row+1,cursor.column,false);
+						setTimeout(function() {
+							that.editor.focus();
+						},300);
+					}
+				})
+			});
 
-            // var buildEditor = function(id, stateId, focus, value, defaultValue, extraLibs, offset) {
-            //     var editor = RED.editor.createEditor({
-            //         id: id,
-            //         mode: 'ace/mode/nrjavascript',
-            //         value: value || defaultValue || "",
-            //         stateId: stateId,
-            //         focus: true,
-            //         globals: {
-            //             msg:true,
-            //             context:true,
-            //             RED: true,
-            //             util: true,
-            //             flow: true,
-            //             global: true,
-            //             console: true,
-            //             Buffer: true,
-            //             setTimeout: true,
-            //             clearTimeout: true,
-            //             setInterval: true,
-            //             clearInterval: true
-            //         },
-            //         extraLibs: extraLibs
-            //     });
-            //     if (defaultValue && value === "") {
-            //         editor.moveCursorTo(defaultValue.split("\n").length +offset, 0);
-            //     }
-            //     editor.__stateId = stateId;
-            //     return editor;
-            // }
-            // this.initEditor = buildEditor('node-input-init-editor', this.id + "/" + "initEditor", false, $("#node-input-initialize").val(), RED._("node-red:function.text.initialize"), undefined, 0);
-            // this.editor = buildEditor('node-input-func-editor', this.id + "/" + "editor", true, $("#node-input-func").val(), undefined, node.libs || [], undefined, -1);
-            // this.finalizeEditor = buildEditor('node-input-finalize-editor', this.id + "/" + "finalizeEditor", false, $("#node-input-finalize").val(), RED._("node-red:function.text.finalize"), undefined, 0);
+            //this.resizeRule = function(option,newWidth) {
+                //option.find(".node-input-option-type").width(newWidth);
+                //  option.find(".node-input-option-label").width(newWidth);
+                //  option.find(".node-input-option-value").width(newWidth);
+            //}
 
-            // RED.library.create({
-            //     url:"functions", // where to get the data from
-            //     type:"function", // the type of object the library is for
-            //     editor:this.editor, // the field name the main text body goes to
-            //     mode:"ace/mode/nrjavascript",
-            //     fields:[
-            //         'name', 'outputs',
-            //         {
-            //             name: 'initialize',
-            //             get: function() {
-            //                 return node.initEditor.getValue();
-            //             },
-            //             set: function(v) {
-            //                 node.initEditor.setValue(v||RED._("node-red:function.text.initialize"), -1);
-            //             }
-            //         },
-            //         {
-            //             name: 'finalize',
-            //             get: function() {
-            //                 return node.finalizeEditor.getValue();
-            //             },
-            //             set: function(v) {
-            //                 node.finalizeEditor.setValue(v||RED._("node-red:function.text.finalize"), -1);
-            //             }
-            //         },
-            //         {
-            //             name: 'info',
-            //             get: function() {
-            //                 return node.infoEditor.getValue();
-            //             },
-            //             set: function(v) {
-            //                 node.infoEditor.setValue(v||"", -1);
-            //             }
-            //         }
-            //     ],
-            //     ext:"js"
-            // });
+            function generateOption(i, option) {
+                var container = $('<li/>',{style:"margin:0; padding:8px 0px 0px; border-bottom:1px solid var(--red-ui-form-input-border-color, #ccc);"});
+                var row = $('<div/>').appendTo(container);
+                var row2 = $('<div/>',{style:"padding-top:5px; padding-left:175px;"}).appendTo(container);
+                var row3 = $('<div/>',{style:"padding-top:5px; padding-left:120px;"}).appendTo(container);
 
-            // var expandButtonClickHandler = function(editor) {
-            //     return function (e) {
-            //         e.preventDefault();
-            //         var value = editor.getValue();
-            //         editor.saveView(`inside function-expandButtonClickHandler ${editor.__stateId}`);
-            //         var extraLibs = node.libs || [];
-            //         RED.editor.editJavaScript({
-            //             value: value,
-            //             width: "Infinity",
-            //             stateId: editor.__stateId,
-            //             mode: "ace/mode/nrjavascript",
-            //             focus: true,
-            //             cancel: function () {
-            //                 setTimeout(function () {
-            //                     editor.focus();
-            //                 }, 250);
-            //             },
-            //             complete: function (v, cursor) {
-            //                 editor.setValue(v, -1);
-            //                 setTimeout(function () {
-            //                     editor.restoreView();
-            //                     editor.focus();
-            //                 }, 250);
-            //             },
-            //             extraLibs: extraLibs
-            //         });
-            //     }
-            // }
-            // $("#node-init-expand-js").on("click", expandButtonClickHandler(this.initEditor));
-            // $("#node-function-expand-js").on("click", expandButtonClickHandler(this.editor));
-            // $("#node-finalize-expand-js").on("click", expandButtonClickHandler(this.finalizeEditor));
+                $('<i style="cursor:move; margin-left:3px;" class="node-input-option-handle fa fa-bars"></i>').appendTo(row);
 
-            // RED.popover.tooltip($("#node-init-expand-js"), RED._("node-red:common.label.expand"));
-            // RED.popover.tooltip($("#node-function-expand-js"), RED._("node-red:common.label.expand"));
-            // RED.popover.tooltip($("#node-finalize-expand-js"), RED._("node-red:common.label.expand"));
+                var labelField = $('<input/>',{class:"node-input-option-label", type:"text", style:"margin-left:7px; width:20%;", placeholder: RED._("Current State"), value:option.label}).appendTo(row);//.typedInput({default:'str',types:['str', 'num']});
+                var eventField = $('<input/>',{class:"node-input-option-event", type:"text", style:"margin-left:7px; width:20%;", placeholder: RED._("Transition Event"), value:option.event}).appendTo(row);//.typedInput({default:'str',types:['str', 'num']});
+                var valueClass ="node-input-option-value"
+                var valueField = $('<input/>',{class:valueClass, type:"text", style:"margin-left:7px; width:20%;", placeholder: RED._("Next State"), value:option.value}).appendTo(row);//.typedInput({default:'str',types:['str','num','bool']});
+                var typeField = $('<select/>',{class:"node-input-option-type",type:"text",style:"margin-left:7px; width:16%"}).appendTo(row);//.typedInput({default:'str',types:['str', 'num']});
 
-            // if (RED.settings.functionExternalModules !== false) {
-            //     prepareLibraryConfig(node);
-            // }
-        },  
-        oneditsave: function() {
-               
-               /* Gather the properties */
-               var items = $("#node-input-property-container").editableList('items');
-               delete this.payloadType;
-               delete this.payload;
-               this.topic = "";
-               var result = getProps(items, true);
-               this.props = result.props;
-               if(result.hasOwnProperty('payloadType')) { this.payloadType = result.payloadType; };
-               if(result.hasOwnProperty('payload')) { this.payload = result.payload; };
-               if(result.hasOwnProperty('topic')) { this.topic = result.topic; };
-           },
-           oneditresize: resizeDialog
-    });
-})();
+                var arr = [
+                {val : "Guarded", text: RED._("Guarded")},
+                {val : "Unguarded", text: RED._("Unguarded")},
+                //   {val : "text", text: RED._("node-red-dashboard/ui_form:ui_form.label.text")},
+                //   {val : "multiline", text: RED._("node-red-dashboard/ui_form:ui_form.label.multiline")},
+                //   {val : "number", text: RED._("node-red-dashboard/ui_form:ui_form.label.number")},
+                //   {val : "email", text: RED._("node-red-dashboard/ui_form:ui_form.label.email")},
+                //   {val : "password", text: RED._("node-red-dashboard/ui_form:ui_form.label.password")},
+                //   {val : "checkbox", text: RED._("node-red-dashboard/ui_form:ui_form.label.checkbox")},
+                //   {val : "switch", text: RED._("node-red-dashboard/ui_form:ui_form.label.switch")},
+                //   {val : "date", text: RED._("node-red-dashboard/ui_form:ui_form.label.date")},
+                //   {val : "time", text: RED._("node-red-dashboard/ui_form:ui_form.label.time")}
+                ];
+
+                $(arr).each(function() {
+                    var isSelected= false;
+                    if (option.type == this.val) {
+                        isSelected = true;
+                    }
+                    typeField.append($("<option>").attr('value',this.val).text(this.text).prop('selected',isSelected));
+                });
+                var finalspan = $('<div/>',{style:"display:inline-block; width:5%;"}).appendTo(row);
+                var deleteButton = $('<a/>',{href:"#",class:"editor-button", style:"font-size:1.3em; left:45%; position:relative;"}).appendTo(finalspan);
+                $('<i/>',{class:"fa fa-trash-o"}).appendTo(deleteButton);
+
+                typeField.change(function(e){
+                    if (e.target.value != 'multiline') {
+                        rowsField.val(undefined)
+                        option.rows = null;
+                        rowsField.css('visibility','hidden')
+                    } else {
+                        rowsField.css('visibility','visible')
+                        if (!rowsField[0].value) rowsField[0].value = 3;
+                    }
+
+                })
+
+                deleteButton.click(function() {
+                    container.find(".node-input-option-value").removeAttr('required')
+                    container.css({"background":"var(--red-ui-secondary-background-inactive, #fee)"});
+                    container.fadeOut(300, function() {
+                        $(this).remove();
+                    });
+                });
+
+                $("#node-input-option-container").append(container);
+            }
+
+            $("#node-input-add-option").click(function() {
+                generateOption($("#node-input-option-container").children().length+1, {});
+                $("#node-input-option-container-div").scrollTop($("#node-input-option-container-div").get(0).scrollHeight);
+            });
+
+            for (var i=0; i<this.options.length; i++) {
+                var option = this.options[i];
+                generateOption(i+1,option);
+            }
+
+            $( "#node-input-option-container" ).sortable({
+                axis: "y",
+                handle:".node-input-option-handle",
+                cursor: "move"
+            });
+		},
+
+oneditsave: function() {
+  var options = $("#node-input-option-container").children();
+  var node = this;
+  node.options = [];
+
+  var userInput = [];
+
+  options.each(function(i) {
+    var option = $(this);
+    var o = {
+      label: option.find(".node-input-option-label").val(),
+      event: option.find(".node-input-option-event").val(),
+      value: option.find(".node-input-option-value").val(),
+      type: option.find(".node-input-option-type").val(),
+    };
+    node.options.push(o);
+    userInput.push(o);
+  });
+
+  var label = [];
+  var event = [];
+  var value = [];
+
+  userInput.forEach(function(item) {
+    var labelIndex = label.indexOf(item.label);
+
+    if (labelIndex === -1) {
+      label.push(item.label);
+      event.push([item.event]);
+      value.push([item.value]);
+    } else {
+      event[labelIndex].push(item.event);
+      value[labelIndex].push(item.value);
+    }
+  });
+
+  var annot = this.editor.getSession().getAnnotations();
+  this.noerr = 0;
+  $("#node-input-noerr").val(0);
+  for (var k = 0; k < annot.length; k++) {
+    if (annot[k].type === "error") {
+      $("#node-input-noerr").val(annot.length);
+      this.noerr = annot.length;
+    }
+  }
+
+  var updatedValue = generateScriptFromValues(label, event, value);
+  $("#node-input-xstateDefinition").val(updatedValue);
+
+  // TODO: Trigger update on the panel to redraw the state machine
+  this.editor.destroy();
+  delete this.editor;
+},
+
+		oneditcancel: function() {
+			this.editor.destroy();
+			delete this.editor;
+		},
+		oneditresize: function(size) {
+			var rows = $("#dialog-form>div:not(.node-text-editor-row)");
+			var height = $("#dialog-form").height();
+			for (var i=0; i<rows.length; i++) {
+				height -= $(rows[i]).outerHeight(true);
+			}
+			var editorRow = $("#dialog-form>div.node-text-editor-row");
+			height -= (parseInt(editorRow.css("marginTop"))+parseInt(editorRow.css("marginBottom")));
+			$(".node-text-editor").css("height",height+"px");
+
+			this.editor.resize();
+            var options = $("#node-input-option-container").children();
+            var newWidth = ($("#node-input-option-container").width() - 175)/2;
+            var node = this;
+            options.each(function(i) {
+                node.resizeRule($(this),newWidth);
+            });
+		},
+		onpaletteadd: function() {
+			var that = this;
+			let uiComponents = RED.dtstate.init();
+			var uiObserver   = new MutationObserver(function(mutations) {
+				// This gets fired when the sidebar is shown or hidden
+				let visible = $(mutations[0].target).is(':visible');
+
+				if( visible ) {
+					RED.comms.unsubscribe('dtstate_transition', that.handleStateMachineTransition);
+					RED.comms.subscribe('dtstate_transition', that.handleStateMachineTransition);
+
+					// The runtime now sends state transition information of the last selected state-machine id
+				} else {
+					RED.comms.unsubscribe('dtstate_transition', that.handleStateMachineTransition);
+				}
+			});
+
+			RED.sidebar.addTab({
+				id: 'dt-state',
+				label: 'state-machines',
+				name: 'State-machines',
+				content: uiComponents.content,
+				toolbar: $('<div><span class="button-group"><a id="red-ui-sidebar-dtstate-open" class="red-ui-footer-button" href="#"><i class="fa fa-desktop"></i></a></span></div>'),
+				enableOnEdit: true,
+				pinned: false,
+				iconClass: 'fa fa-dot-circle-o',
+				action: 'contrib:show-dtstate-tab'
+			});
+			RED.actions.add('contrib:show-dtstate-tab', function() {
+				RED.sidebar.show('dt-state');
+			});
+
+			RED.events.on("nodes:add", function(node) { 
+				if( node.hasOwnProperty("type") && node.type == "dtstate" ) {
+					// DO NOTHING!
+				}
+			});
+
+			// Select the parent container for our sidebar
+			let sidebarContainer = document.querySelector('#red-ui-sidebar-dtstate-content').parentNode.parentNode;
+			
+			// Setup the observer
+			uiObserver.observe(sidebarContainer, {
+				attributes:true
+			});
+
+			// TODO: Extra view window
+			RED.popover.tooltip($("#red-ui-sidebar-dtstate-open"),RED._('node-red:debug.sidebar.openWindow'));
+			$("#red-ui-sidebar-dtstate-open").on("click", function(e) {
+					e.preventDefault();
+					alert("NOT YET IMPLEMENTED");
+					return;
+					subWindow = window.open(document.location.toString().replace(/[?#].*$/,"")+"debug/view/view.html"+document.location.search,"nodeREDDebugView","menubar=no,location=no,toolbar=no,chrome,height=500,width=600");
+					subWindow.onload = function() {
+						subWindow.postMessage({event:"workspaceChange",activeWorkspace:RED.workspaces.active()},"*");
+					};
+				});
+
+			
+			// Subscribe to comms
+			this.handleStateMachineTransition = function(t,o) {
+				if( !(typeof o === "object") || !("type" in o) || typeof o.type !== "string" ) return;
+
+				switch( o.type ) {
+					case 'transition':
+						// Animate graph
+						// TODO: Probably add a checkbox in the panel to enable/disable animation
+						RED.dtstate.animate(o);
+						break;
+					case 'context':
+						RED.dtstate.updateContext(o);
+						break;
+					default:
+						return;
+				}
+			};
+
+			this.handleStateMachineDisplay = function(t,o) {
+				if( !(typeof o === "object") || !("type" in o) ) return;
+
+				switch( o.type.toLowerCase() ) {
+					case 'add':
+						// Add to sidebar
+						if( !Array.isArray(o.data) ) o.data = [o.data];
+						for( let el of o.data )
+						RED.dtstate.addStatemachineToSidebar(el.id, el.path.labels.join('/'), el.rootId, el.alias);
+						break;
+					case 'delete':
+						// Remove from sidebar
+						if( !Array.isArray(o.data) ) o.data = [o.data];
+						for( let el of o.data ) 
+							RED.dtstate.deleteStatemachineFromSidebar(el.id);
+
+						break;
+				}
+			}
+
+			RED.comms.subscribe('dt-state', this.handleStateMachineDisplay);
+		},
+		onpaletteremove: function() {
+			RED.comms.unsubscribe('dt-state', this.handleStateMachineDisplay);
+			RED.comms.unsubscribe('dtstate_transition', this.handleStateMachineTransition);
+			RED.sidebar.removeTab('dt-state');
+			RED.actions.remove("contrib:show-dtstate-tab");
+
+			delete RED.dtstate;
+		}
+	});
 </script>
-<script type="text/html" data-help-name="dt-state">
-    <p>Some useful help text to introduce the STATE NODE.</p>
+
+<script type="text/x-red" data-help-name="dt-state">
+	<p>Provides a runtime environment for state machines using <a href="https://xstate.js.org/docs/" target="_blank">XSTATE</a>.</p>
+<style>
+    #red-ui-dtstate-help-container pre {
+        overflow-x: auto;
+        white-space: pre;
+    }
+</style>
+<div id="red-ui-dtstate-help-container">
+	<h3>Properties</h3>
+		<dl class="message-properties">
+			<dt>name<span class="property-type">string</span></dt>
+			<dd>The name of the node as displayed in the editor</dd>
+			<dt>xstateDefinition<span class="property-type">string/javascript</span></dt>
+			<dd>
+                This contains the xstate-compatible code to setup the state-machine. The code has to end with
+                a statement that returns an object of the form
+<pre>{
+    &lt;<a href="https://xstate.js.org/docs/guides/machines.html#configuration" target="_blank">xstate machine definition</a>&gt;
+}</pre>
+                or
+<pre>{
+    machine: &lt;<a href="https://xstate.js.org/docs/guides/machines.html#configuration" target="_blank">xstate machine definition</a>&gt;,
+    config: &lt;<a href="https://xstate.js.org/docs/guides/machines.html#options" target="_blank">xstate machine options</a>&gt;
+}</pre>
+                Anywhere in the code you may use the same functions as in the function node such as e.g. <code>node.send()</code>
+                or <code>setTimeout()</code>. Additionally you can use all the exports of the <em>xstate</em> library via the
+                <code>xstate</code> object. For examle to import the <code>assign</code>, <code>raise</code> and <code>log</code> functions type:
+<pre>const { actions, assign } = xstate;
+const { raise, log } = actions;</pre>
+            </dd>
+		</dl>
+
+	<h3>Inputs</h3>
+	<dl class="message-properties">
+	    <dt>topic <span class="property-type">string</span></dt>
+        <dd>
+            - <code>"reset"</code> to reset machine to initial state<br/>
+            - <code>&lt;name of event&gt;</code> to trigger a transition<br/>
+        </dd>
+		<dt>payload <span class="property-type">object</span> </dt>
+		<dd>
+            The data which comes with the event. It can then be used via the 
+            <code>.value</code> property of the event object within 
+            action/activity/guard/service callbacks.
+		 </dd>
+	</dl>
+
     <h3>Outputs</h3>
+    <p>The two outports output messages of the following specifications:</p>
+	<ol class="node-ports">
+		<li>On occuring event/transition/change of context
+            <dl class="message-properties">
+				<dt>topic <span class="property-type">string</span></dt>
+                <dd>Equals to <code>"state"</code> if an event or transition occured. If the data changed it equals to <code>"context"</code>.</dd>
+			<dl class="message-properties">
+				<dt>payload <span class="property-type">object</span></dt>
+                <dd>
+                    Contains an object that represents the current state of the machine if the topic is <code>"state"</code>.
+                    See details below for more information. In case of a changed context this contains an object with the new
+                    context value.
+                </dd>
+			</dl>
+        </li>
+        <li>Message sent internally from the machine
+			<dl class="message-properties">
+                <dd>Analogous to the function-node all messages sent via <code>node.send([msg1, msg2, ...]);</code> from within
+                    the machine are output through this outport.
+                </dd>
+			</dl>
+        </li>
+	</ol>
+
+	<h3>Details</h3>
+    <p>
+        See the default node for an example implementation. Also please refer to the excellent
+        <a href="https://xstate.js.org/docs/guides/machines.html" target="_blank">xstate documentation</a>
+        for futher details about how to model your use-case as a xstate machine.
+    </p>
+    <p>
+        The <code>payload</code> objects for messages with a topic of <code>"state"</code> output from the 
+        first outport have the following properties:</p>
+    <p>
         <dl class="message-properties">
-        <dt>payload
-            <span class="property-type">string | buffer</span>
-        </dt>
-    <h3>Details</h3>
-    <p>Some more information about the node.</p>
- </script>
- 
+            <dt>state <span class="property-type">string or object</span></dt>            
+            <dd>
+                the path of the currently active states as object. If only a top-level 
+                state is active then this is a string with the name of the active state.
+                If multiple states are active this is an object where each key is a parent
+                state and each leaf is a string property value, e.g.
+<pre>{
+    parentstate1: "childstate1",
+    parentstate2: {
+        childparentstate1: "childstate211",
+        childstate21: {}
+    }
+}</pre>
+                Here the active state <code>parentstate2.childstate21</code> does not 
+                contain any childstate, so the property value is an empty object <code>{}</code>.
+            </dd>
+
+            <dt>changed <span class="property-type">boolean</span></dt>
+            <dd>boolean flag that is true if the state or context was changed</dd>
+
+            <dt>done <span class="property-type">boolean</span></dt>
+            <dd>
+                boolean flag that is true if the machine contains a final state which has been reached.
+                You can use it to e.g. trigger a <code>"reset"</code> event.
+            </dd>
+
+            <dt>activities <span class="property-type">object</span></dt>
+            <dd>object containing all activities with a boolean flag indicating if they are running</dd>
+
+            <dt>actions <span class="property-type">object</span></dt>
+            <dd>object containing all actions which are currently active</dd>
+
+            <dt>event <span class="property-type">object</span></dt>
+            <dd>
+                the event object (including the <code>.value</code> property containing event data) 
+                that triggered this message e.g.
+<pre>{
+    type: "TRIGGER", // The event name
+    value: 5         // The event data (may be an object itself)
+}</pre>
+            </dd>
+
+            <dt>context <span class="property-type">object</span></dt>
+            <dd>an object containing the current value data context of the machine</dd>
+        </dl> 
+    </p>
+
+    <h3>The sidebar</h3>
+    <p>
+        Open the <a href="#" onclick="RED.sidebar.show('dt-state')">sidebar</a> in the node-red editor UI to get a visual graph
+        representation of your machine and its current state and context data. The graph
+        is drawn using <a href="https://www.npmjs.com/package/state-machine-cat">state-machine-cat</a>.
+    </p>
+    <p>
+        On the sidebar you will find a dropdown box containin all running state-machine
+        instances. Upon selection of an instance the graph below gets redrawn and current
+        context is shown. Also the current state is highlighted in red within the graph.
+    </p>
+    <p>
+        The sidebar offers buttons to control various things of the viewed machine:
+        <ul>
+            <li><i class="fa fa-search-minus"></i> <span>Reveal the node containing the state machine instance</span></li>
+            <li><i class="fa fa-search-plus"></i> <span>Reveal the prototype node within a subflow if it is defined within one</span></li>
+            <li><i class="fa fa-undo"></i> <span>Reset the machine to its initial state and context</span></li>
+            <li><i class="fa fa-refresh"></i> <span>Reload the state-machine graph</span></li>
+        </ul>
+    </p>
+</div>
+</script>
+
